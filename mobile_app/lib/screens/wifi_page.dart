@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'controller_screen.dart';
 
 class WifiPage extends StatefulWidget {
   const WifiPage({super.key});
@@ -38,6 +39,16 @@ class _WifiPageState extends State<WifiPage> {
 
       // Send a test message
       socket!.write("Hello from Hold My Steering!\n");
+
+      // Go to controller screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ControllerScreen(
+            socket: socket!,
+          ),
+        ),
+      );
 
       // Listen for messages from PC
       socket!.listen(
