@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
+import 'dart:async';
+import 'package:sensors_plus/sensors_plus.dart';
 
 class ControllerScreen extends StatefulWidget {
   final Socket socket;
 
-  const ControllerScreen({
-    super.key,
-    required this.socket,
-  });
+  const ControllerScreen({super.key, required this.socket});
 
   @override
   State<ControllerScreen> createState() => _ControllerScreenState();
@@ -17,6 +16,11 @@ class ControllerScreen extends StatefulWidget {
 class _ControllerScreenState extends State<ControllerScreen> {
   double brakeStartY = 0;
   double throttleStartY = 0;
+
+  double brakePercentage = 0;
+  double throttlePercentage = 0;
+
+  late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
 
   static const double maxSwipeDistance = 250;
 
@@ -30,6 +34,19 @@ class _ControllerScreenState extends State<ControllerScreen> {
     return percentage.toInt();
   }
 
+  int calculateSteering(double y) {
+    double steering = (y / 9.5) * 100;
+
+    steering = steering.clamp(-100, 100);
+
+    // Dead zone
+    if (steering.abs() < 10) {
+      steering = 0;
+    }
+
+    return steering.toInt();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -40,18 +57,24 @@ class _ControllerScreenState extends State<ControllerScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+
+    accelerometerSubscription = accelerometerEventStream().listen((event) {
+      int steering = calculateSteering(event.y);
+
+      print("STEER: $steering");
+
+      widget.socket.write("STEER:$steering\n");
+    });
   }
 
   @override
   void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    accelerometerSubscription.cancel();
+
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -66,24 +89,40 @@ class _ControllerScreenState extends State<ControllerScreen> {
                 onVerticalDragStart: (details) {
                   brakeStartY = details.localPosition.dy;
                 },
-
                 onVerticalDragUpdate: (details) {
                   int percentage = calculatePercentage(
                     brakeStartY,
                     details.localPosition.dy,
                   );
 
-                  widget.socket.write(
-                    "BRAKE:$percentage\n",
-                  );
-                },
+                  setState(() {
+                    brakePercentage = percentage.toDouble();
+                  });
 
+                  widget.socket.write("BRAKE:$percentage\n");
+                },
                 onVerticalDragEnd: (_) {
+                  setState(() {
+                    brakePercentage = 0;
+                  });
+
                   widget.socket.write("BRAKE:0\n");
                 },
-
-                child: Container(
-                  color: Colors.black,
+                child: Stack(
+                  children: [
+                    Container(color: Colors.black),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 100),
+                        width: double.infinity,
+                        height:
+                            MediaQuery.of(context).size.height *
+                            (brakePercentage / 100),
+                        color: Colors.red.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -94,24 +133,40 @@ class _ControllerScreenState extends State<ControllerScreen> {
                 onVerticalDragStart: (details) {
                   throttleStartY = details.localPosition.dy;
                 },
-
                 onVerticalDragUpdate: (details) {
                   int percentage = calculatePercentage(
                     throttleStartY,
                     details.localPosition.dy,
                   );
 
-                  widget.socket.write(
-                    "THROTTLE:$percentage\n",
-                  );
-                },
+                  setState(() {
+                    throttlePercentage = percentage.toDouble();
+                  });
 
+                  widget.socket.write("THROTTLE:$percentage\n");
+                },
                 onVerticalDragEnd: (_) {
+                  setState(() {
+                    throttlePercentage = 0;
+                  });
+
                   widget.socket.write("THROTTLE:0\n");
                 },
-
-                child: Container(
-                  color: Colors.black,
+                child: Stack(
+                  children: [
+                    Container(color: Colors.black),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 100),
+                        width: double.infinity,
+                        height:
+                            MediaQuery.of(context).size.height *
+                            (throttlePercentage / 100),
+                        color: Colors.green.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
