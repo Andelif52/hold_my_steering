@@ -1,0 +1,22 @@
+# Flutter
+
+hold_my_steering/build/
+hold_my_steering/.dart_tool/
+hold_my_steering/.idea/
+hold_my_steering/.flutter-plugins
+hold_my_steering/.flutter-plugins-dependencies
+hold_my_steering/.packages
+
+# C#
+
+HoldMySteeringReceiver/bin/
+HoldMySteeringReceiver/obj/
+
+# Visual Studio
+
+.vs/
+
+# OS Files
+
+Thumbs.db
+.DS_Store
