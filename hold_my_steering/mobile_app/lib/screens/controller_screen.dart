@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:sensors_plus/sensors_plus.dart';
+import '../settings/controller_settings.dart';
 
 class ControllerScreen extends StatefulWidget {
   final Socket socket;
@@ -20,6 +21,9 @@ class _ControllerScreenState extends State<ControllerScreen> {
   double brakePercentage = 0;
   double throttlePercentage = 0;
 
+  double get steeringSensitivity =>
+    ControllerSettings.steeringSensitivity / 100;
+
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
 
   static const double maxSwipeDistance = 250;
@@ -34,18 +38,26 @@ class _ControllerScreenState extends State<ControllerScreen> {
     return percentage.toInt();
   }
 
-  int calculateSteering(double y) {
-    double steering = (y / 9.5) * 100;
+  int calculateSteering(double yValue) {
+  const double maximumSensorValue = 10;
+  const double maximumSteeringAngle = 95.0;
 
-    steering = steering.clamp(-100, 100);
+  print(yValue);
 
-    // Dead zone
-    if (steering.abs() < 10) {
-      steering = 0;
-    }
+  // Convert sensor value into steering angle.
+  double steeringAngle =
+      (yValue / maximumSensorValue) *
+      maximumSteeringAngle;
 
-    return steering.toInt();
-  }
+  // Apply steering sensitivity.
+  steeringAngle *= steeringSensitivity;
+
+  // Maximum steering angle is fixed at ±90°.
+  //steeringAngle = steeringAngle.clamp(-90.0, 90.0);
+
+  return steeringAngle.round();
+}
+
 
   @override
   void initState() {
@@ -62,6 +74,14 @@ class _ControllerScreenState extends State<ControllerScreen> {
       int steering = calculateSteering(event.y);
 
       print("STEER: $steering");
+
+      // print("----------------");
+
+      // print(event.x);
+
+      // print(event.y);
+
+      // print(event.z);
 
       widget.socket.write("STEER:$steering\n");
     });

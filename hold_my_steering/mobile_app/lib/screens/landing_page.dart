@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'wifi_page.dart';
+import 'settings_page.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -18,6 +19,11 @@ class LandingPage extends StatelessWidget {
             icon: const Icon(Icons.settings),
             onPressed: () {
               // Navigate to Settings Page
+              Navigator.push(
+                context,
+
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
             },
           ),
         ],
@@ -68,8 +74,7 @@ class LandingPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const WifiPage()),
+                      MaterialPageRoute(builder: (context) => const WifiPage()),
                     ); // Navigate to WiFi Screen
                   },
                 ),
