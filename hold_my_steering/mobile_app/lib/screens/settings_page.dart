@@ -11,13 +11,18 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
 
   List<int> steeringValues = [];
+  List<int> swipeValues = [];
 
   @override
   void initState() {
     super.initState();
 
-    for(int i = 50 ; i <= 200 ; i += 10){
+    for (int i = 50; i <= 200; i += 10) {
       steeringValues.add(i);
+    }
+
+    for (int i = 25; i <= 100; i += 5) {
+      swipeValues.add(i);
     }
   }
 
@@ -37,6 +42,8 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
 
         children: [
+
+          // Steering Sensitivity
 
           ListTile(
 
@@ -108,9 +115,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
           const Divider(),
 
-          const ListTile(
+          // Swipe Sensitivity
 
-            title: Text(
+          ListTile(
+
+            title: const Text(
               "Swipe Sensitivity",
               style: TextStyle(
                 color: Colors.white,
@@ -118,15 +127,67 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             subtitle: Text(
-              "Coming Soon",
-              style: TextStyle(
+              "${ControllerSettings.swipeSensitivity.round()}%",
+              style: const TextStyle(
                 color: Colors.grey,
               ),
             ),
 
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+            ),
+
+            onTap: () {
+
+              showModalBottomSheet(
+
+                context: context,
+
+                builder: (context){
+
+                  return ListView.builder(
+
+                    itemCount: swipeValues.length,
+
+                    itemBuilder: (context,index){
+
+                      return ListTile(
+
+                        title:
+                        Text("${swipeValues[index]}%"),
+
+                        onTap: (){
+
+                          setState(() {
+
+                            ControllerSettings
+                                .setSwipeSensitivity(
+                                swipeValues[index].toDouble());
+
+                          });
+
+                          Navigator.pop(context);
+
+                        },
+
+                      );
+
+                    },
+
+                  );
+
+                },
+
+              );
+
+            },
+
           ),
 
           const Divider(),
+
+          // Steering Calibration
 
           const ListTile(
 

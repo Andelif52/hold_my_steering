@@ -1,14 +1,11 @@
 class ControllerSettings {
-
   // Steering Sensitivity
 
   static int steeringSensitivity = 100;
 
+  // Swipe Sensitivity
 
-  // Swipe Sensitivity (in millimeters)
-
-  static double swipeSensitivityMM = 40;
-
+  static double swipeSensitivity = 50;
 
   // Steering Calibration
 
@@ -16,4 +13,23 @@ class ControllerSettings {
 
   static bool isCalibrated = false;
 
+  // Steering Sensitivity
+
+  static int getSteeringSensitivity() {
+    return steeringSensitivity;
+  }
+
+  static void setSteeringSensitivity(int value) {
+    steeringSensitivity = value;
+  }
+
+  // Swipe Sensitivity
+
+  static double getSwipeSensitivity() {
+    return swipeSensitivity;
+  }
+
+  static void setSwipeSensitivity(double value) {
+    swipeSensitivity = value;
+  }
 }

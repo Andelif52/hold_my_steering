@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:async';
+import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../settings/controller_settings.dart';
 
@@ -22,16 +23,38 @@ class _ControllerScreenState extends State<ControllerScreen> {
   double throttlePercentage = 0;
 
   double get steeringSensitivity =>
-    ControllerSettings.steeringSensitivity / 100;
+      ControllerSettings.steeringSensitivity / 100;
 
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
 
-  static const double maxSwipeDistance = 250;
+  // Swipe Sensitivity
 
-  int calculatePercentage(double startY, double currentY) {
+  double getMaxSwipeDistance() {
+    double sensitivity =
+        ControllerSettings.getSwipeSensitivity();
+
+    // Convert 25%-100% into 0.0-1.0.
+    double normalizedValue =
+        (sensitivity - 25) / 75;
+
+    // 25% = 400 pixels
+    // 100% = 100 pixels
+    return lerpDouble(
+            400,
+            100,
+            normalizedValue)!
+        .toDouble();
+  }
+
+  int calculatePercentage(
+      double startY,
+      double currentY,
+      ) {
+
     double distance = startY - currentY;
 
-    double percentage = (distance / maxSwipeDistance) * 100;
+    double percentage =
+        (distance / getMaxSwipeDistance()) * 100;
 
     percentage = percentage.clamp(0, 100);
 
@@ -39,25 +62,24 @@ class _ControllerScreenState extends State<ControllerScreen> {
   }
 
   int calculateSteering(double yValue) {
-  const double maximumSensorValue = 10;
-  const double maximumSteeringAngle = 95.0;
+    const double maximumSensorValue = 10;
+    const double maximumSteeringAngle = 95.0;
 
-  print(yValue);
+    print(yValue);
 
-  // Convert sensor value into steering angle.
-  double steeringAngle =
-      (yValue / maximumSensorValue) *
-      maximumSteeringAngle;
+    // Convert sensor value into steering angle.
+    double steeringAngle =
+        (yValue / maximumSensorValue) *
+            maximumSteeringAngle;
 
-  // Apply steering sensitivity.
-  steeringAngle *= steeringSensitivity;
+    // Apply steering sensitivity.
+    steeringAngle *= steeringSensitivity;
 
-  // Maximum steering angle is fixed at ±90°.
-  //steeringAngle = steeringAngle.clamp(-90.0, 90.0);
+    // Maximum steering angle is fixed at ±90°.
+    //steeringAngle = steeringAngle.clamp(-90.0, 90.0);
 
-  return steeringAngle.round();
-}
-
+    return steeringAngle.round();
+  }
 
   @override
   void initState() {
@@ -70,28 +92,26 @@ class _ControllerScreenState extends State<ControllerScreen> {
       DeviceOrientation.landscapeRight,
     ]);
 
-    accelerometerSubscription = accelerometerEventStream().listen((event) {
-      int steering = calculateSteering(event.y);
+    accelerometerSubscription =
+        accelerometerEventStream().listen((event) {
 
-      print("STEER: $steering");
+          int steering =
+          calculateSteering(event.y);
 
-      // print("----------------");
+          print("STEER: $steering");
 
-      // print(event.x);
-
-      // print(event.y);
-
-      // print(event.z);
-
-      widget.socket.write("STEER:$steering\n");
-    });
+          widget.socket.write(
+              "STEER:$steering\n");
+        });
   }
 
   @override
   void dispose() {
     accelerometerSubscription.cancel();
 
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
 
     super.dispose();
   }
@@ -100,96 +120,157 @@ class _ControllerScreenState extends State<ControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+
       body: SafeArea(
         child: Row(
           children: [
+
             // LEFT HALF = BRAKE
+
             Expanded(
               child: GestureDetector(
+
                 onVerticalDragStart: (details) {
-                  brakeStartY = details.localPosition.dy;
+                  brakeStartY =
+                      details.localPosition.dy;
                 },
+
                 onVerticalDragUpdate: (details) {
-                  int percentage = calculatePercentage(
+
+                  int percentage =
+                  calculatePercentage(
                     brakeStartY,
                     details.localPosition.dy,
                   );
 
                   setState(() {
-                    brakePercentage = percentage.toDouble();
+                    brakePercentage =
+                        percentage.toDouble();
                   });
 
-                  widget.socket.write("BRAKE:$percentage\n");
+                  widget.socket.write(
+                      "BRAKE:$percentage\n");
                 },
+
                 onVerticalDragEnd: (_) {
+
                   setState(() {
                     brakePercentage = 0;
                   });
 
-                  widget.socket.write("BRAKE:0\n");
+                  widget.socket.write(
+                      "BRAKE:0\n");
                 },
+
                 child: Stack(
                   children: [
-                    Container(color: Colors.black),
+
+                    Container(
+                        color: Colors.black),
+
                     Align(
-                      alignment: Alignment.bottomCenter,
+                      alignment:
+                      Alignment.bottomCenter,
+
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 100),
-                        width: double.infinity,
+
+                        duration:
+                        const Duration(
+                          milliseconds: 100,
+                        ),
+
+                        width:
+                        double.infinity,
+
                         height:
-                            MediaQuery.of(context).size.height *
+                        MediaQuery.of(context)
+                            .size
+                            .height *
                             (brakePercentage / 100),
-                        color: Colors.red.withOpacity(0.7),
+
+                        color: Colors.red
+                            .withOpacity(0.7),
                       ),
                     ),
+
                   ],
                 ),
               ),
             ),
 
             // RIGHT HALF = THROTTLE
+
             Expanded(
               child: GestureDetector(
+
                 onVerticalDragStart: (details) {
-                  throttleStartY = details.localPosition.dy;
+                  throttleStartY =
+                      details.localPosition.dy;
                 },
+
                 onVerticalDragUpdate: (details) {
-                  int percentage = calculatePercentage(
+
+                  int percentage =
+                  calculatePercentage(
                     throttleStartY,
                     details.localPosition.dy,
                   );
 
                   setState(() {
-                    throttlePercentage = percentage.toDouble();
+                    throttlePercentage =
+                        percentage.toDouble();
                   });
 
-                  widget.socket.write("THROTTLE:$percentage\n");
+                  widget.socket.write(
+                      "THROTTLE:$percentage\n");
                 },
+
                 onVerticalDragEnd: (_) {
+
                   setState(() {
                     throttlePercentage = 0;
                   });
 
-                  widget.socket.write("THROTTLE:0\n");
+                  widget.socket.write(
+                      "THROTTLE:0\n");
                 },
+
                 child: Stack(
                   children: [
-                    Container(color: Colors.black),
+
+                    Container(
+                        color: Colors.black),
+
                     Align(
-                      alignment: Alignment.bottomCenter,
+                      alignment:
+                      Alignment.bottomCenter,
+
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 100),
-                        width: double.infinity,
+
+                        duration:
+                        const Duration(
+                          milliseconds: 100,
+                        ),
+
+                        width:
+                        double.infinity,
+
                         height:
-                            MediaQuery.of(context).size.height *
+                        MediaQuery.of(context)
+                            .size
+                            .height *
                             (throttlePercentage / 100),
-                        color: Colors.green.withOpacity(0.7),
+
+                        color: Colors.green
+                            .withOpacity(0.7),
                       ),
                     ),
+
                   ],
                 ),
               ),
             ),
+
           ],
         ),
       ),
