@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'screens/landing_page.dart';
+import 'settings/controller_settings.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await ControllerSettings.loadCalibration();
+
   runApp(const HoldMySteeringApp());
 }
 

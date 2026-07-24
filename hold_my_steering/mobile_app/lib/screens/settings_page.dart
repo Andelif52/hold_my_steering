@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../settings/controller_settings.dart';
+import 'calibration_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -9,7 +10,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   List<int> steeringValues = [];
   List<int> swipeValues = [];
 
@@ -28,9 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: Colors.black,
 
       appBar: AppBar(
@@ -40,13 +38,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
 
       body: ListView(
-
         children: [
 
           // Steering Sensitivity
 
           ListTile(
-
             title: const Text(
               "Steering Sensitivity",
               style: TextStyle(
@@ -67,50 +63,33 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             onTap: () {
-
               showModalBottomSheet(
-
                 context: context,
 
-                builder: (context){
-
+                builder: (context) {
                   return ListView.builder(
-
                     itemCount: steeringValues.length,
 
-                    itemBuilder: (context,index){
-
+                    itemBuilder: (context, index) {
                       return ListTile(
+                        title: Text(
+                            "${steeringValues[index]}%"),
 
-                        title:
-                        Text("${steeringValues[index]}%"),
-
-                        onTap: (){
-
+                        onTap: () {
                           setState(() {
-
                             ControllerSettings
-                                .steeringSensitivity =
-                            steeringValues[index];
-
+                                    .steeringSensitivity =
+                                steeringValues[index];
                           });
 
                           Navigator.pop(context);
-
                         },
-
                       );
-
                     },
-
                   );
-
                 },
-
               );
-
             },
-
           ),
 
           const Divider(),
@@ -118,7 +97,6 @@ class _SettingsPageState extends State<SettingsPage> {
           // Swipe Sensitivity
 
           ListTile(
-
             title: const Text(
               "Swipe Sensitivity",
               style: TextStyle(
@@ -139,59 +117,43 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             onTap: () {
-
               showModalBottomSheet(
-
                 context: context,
 
-                builder: (context){
-
+                builder: (context) {
                   return ListView.builder(
-
                     itemCount: swipeValues.length,
 
-                    itemBuilder: (context,index){
-
+                    itemBuilder: (context, index) {
                       return ListTile(
+                        title: Text(
+                            "${swipeValues[index]}%"),
 
-                        title:
-                        Text("${swipeValues[index]}%"),
-
-                        onTap: (){
-
+                        onTap: () {
                           setState(() {
-
                             ControllerSettings
                                 .setSwipeSensitivity(
-                                swipeValues[index].toDouble());
-
+                              swipeValues[index]
+                                  .toDouble(),
+                            );
                           });
 
                           Navigator.pop(context);
-
                         },
-
                       );
-
                     },
-
                   );
-
                 },
-
               );
-
             },
-
           ),
 
           const Divider(),
 
           // Steering Calibration
 
-          const ListTile(
-
-            title: Text(
+          ListTile(
+            title: const Text(
               "Steering Calibration",
               style: TextStyle(
                 color: Colors.white,
@@ -199,18 +161,36 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             subtitle: Text(
-              "Coming Soon",
-              style: TextStyle(
+              ControllerSettings.getCalibrationStatus()
+                  ? "Calibrated"
+                  : "Not Calibrated",
+              style: const TextStyle(
                 color: Colors.grey,
               ),
             ),
 
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+            ),
+
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const CalibrationPage(),
+                ),
+              );
+
+              // Refresh the page after returning.
+
+              setState(() {});
+            },
           ),
 
         ],
-
       ),
-
     );
   }
 }

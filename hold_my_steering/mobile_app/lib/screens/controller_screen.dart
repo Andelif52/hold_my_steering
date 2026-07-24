@@ -25,7 +25,8 @@ class _ControllerScreenState extends State<ControllerScreen> {
   double get steeringSensitivity =>
       ControllerSettings.steeringSensitivity / 100;
 
-  late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+  late StreamSubscription<AccelerometerEvent>
+      accelerometerSubscription;
 
   // Swipe Sensitivity
 
@@ -40,17 +41,17 @@ class _ControllerScreenState extends State<ControllerScreen> {
     // 25% = 400 pixels
     // 100% = 100 pixels
     return lerpDouble(
-            400,
-            100,
-            normalizedValue)!
+      400,
+      100,
+      normalizedValue,
+    )!
         .toDouble();
   }
 
   int calculatePercentage(
-      double startY,
-      double currentY,
-      ) {
-
+    double startY,
+    double currentY,
+  ) {
     double distance = startY - currentY;
 
     double percentage =
@@ -75,8 +76,9 @@ class _ControllerScreenState extends State<ControllerScreen> {
     // Apply steering sensitivity.
     steeringAngle *= steeringSensitivity;
 
-    // Maximum steering angle is fixed at ±90°.
-    //steeringAngle = steeringAngle.clamp(-90.0, 90.0);
+    // Maximum steering angle is fixed.
+    // steeringAngle =
+    // steeringAngle.clamp(-90.0, 90.0);
 
     return steeringAngle.round();
   }
@@ -93,16 +95,26 @@ class _ControllerScreenState extends State<ControllerScreen> {
     ]);
 
     accelerometerSubscription =
-        accelerometerEventStream().listen((event) {
+        accelerometerEventStream().listen(
+              (event) {
+            double yValue = event.y;
 
-          int steering =
-          calculateSteering(event.y);
+            // Apply calibration only if available.
 
-          print("STEER: $steering");
+            if (ControllerSettings.getCalibrationStatus()) {
+              yValue = yValue -
+                  ControllerSettings.getSteeringOffset();
+            }
 
-          widget.socket.write(
-              "STEER:$steering\n");
-        });
+            int steering =
+            calculateSteering(yValue);
+
+            print("STEER: $steering");
+
+            widget.socket.write(
+                "STEER:$steering\n");
+          },
+        );
   }
 
   @override
@@ -120,7 +132,6 @@ class _ControllerScreenState extends State<ControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       body: SafeArea(
         child: Row(
           children: [
@@ -129,14 +140,12 @@ class _ControllerScreenState extends State<ControllerScreen> {
 
             Expanded(
               child: GestureDetector(
-
                 onVerticalDragStart: (details) {
                   brakeStartY =
                       details.localPosition.dy;
                 },
 
                 onVerticalDragUpdate: (details) {
-
                   int percentage =
                   calculatePercentage(
                     brakeStartY,
@@ -153,7 +162,6 @@ class _ControllerScreenState extends State<ControllerScreen> {
                 },
 
                 onVerticalDragEnd: (_) {
-
                   setState(() {
                     brakePercentage = 0;
                   });
@@ -164,16 +172,13 @@ class _ControllerScreenState extends State<ControllerScreen> {
 
                 child: Stack(
                   children: [
-
                     Container(
                         color: Colors.black),
 
                     Align(
                       alignment:
                       Alignment.bottomCenter,
-
                       child: AnimatedContainer(
-
                         duration:
                         const Duration(
                           milliseconds: 100,
@@ -192,7 +197,6 @@ class _ControllerScreenState extends State<ControllerScreen> {
                             .withOpacity(0.7),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -202,14 +206,12 @@ class _ControllerScreenState extends State<ControllerScreen> {
 
             Expanded(
               child: GestureDetector(
-
                 onVerticalDragStart: (details) {
                   throttleStartY =
                       details.localPosition.dy;
                 },
 
                 onVerticalDragUpdate: (details) {
-
                   int percentage =
                   calculatePercentage(
                     throttleStartY,
@@ -226,7 +228,6 @@ class _ControllerScreenState extends State<ControllerScreen> {
                 },
 
                 onVerticalDragEnd: (_) {
-
                   setState(() {
                     throttlePercentage = 0;
                   });
@@ -237,16 +238,13 @@ class _ControllerScreenState extends State<ControllerScreen> {
 
                 child: Stack(
                   children: [
-
                     Container(
                         color: Colors.black),
 
                     Align(
                       alignment:
                       Alignment.bottomCenter,
-
                       child: AnimatedContainer(
-
                         duration:
                         const Duration(
                           milliseconds: 100,
@@ -265,12 +263,10 @@ class _ControllerScreenState extends State<ControllerScreen> {
                             .withOpacity(0.7),
                       ),
                     ),
-
                   ],
                 ),
               ),
             ),
-
           ],
         ),
       ),
