@@ -33,11 +33,12 @@
             lblThrottle = new Label();
             lblBrake = new Label();
             lblSteering = new Label();
+            btnClose = new Button();
             SuspendLayout();
             // 
             // btnStart
             // 
-            btnStart.Location = new Point(312, 380);
+            btnStart.Location = new Point(188, 379);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(125, 43);
             btnStart.TabIndex = 0;
@@ -77,11 +78,23 @@
             lblSteering.TabIndex = 4;
             lblSteering.Text = "Steering: 0";
             // 
+            // btnClose
+            // 
+            btnClose.Enabled = false;
+            btnClose.Location = new Point(376, 379);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(125, 43);
+            btnClose.TabIndex = 5;
+            btnClose.Text = "Close Server";
+            btnClose.UseVisualStyleBackColor = true;
+            btnClose.Click += btnClose_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnClose);
             Controls.Add(lblSteering);
             Controls.Add(lblBrake);
             Controls.Add(lblThrottle);
@@ -99,5 +112,6 @@
         private Label lblThrottle;
         private Label lblBrake;
         private Label lblSteering;
+        private Button btnClose;
     }
 }

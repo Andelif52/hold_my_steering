@@ -17,3 +17,23 @@ C:\C Sharp\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-window
 C:\C Sharp\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\Nefarius.ViGEm.Client.dll
 C:\C Sharp\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.csproj.AssemblyReference.cache
 C:\C Sharp\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySt.B829111C.Up2Date
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\HoldMySteeringReceiver.exe
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\HoldMySteeringReceiver.deps.json
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\HoldMySteeringReceiver.runtimeconfig.json
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\HoldMySteeringReceiver.dll
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\HoldMySteeringReceiver.pdb
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\bin\Debug\net8.0-windows\Nefarius.ViGEm.Client.dll
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.csproj.AssemblyReference.cache
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.Form1.resources
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.csproj.GenerateResource.cache
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.GeneratedMSBuildEditorConfig.editorconfig
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.AssemblyInfoInputs.cache
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.AssemblyInfo.cs
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.csproj.CoreCompileInputs.cache
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.sourcelink.json
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySt.B829111C.Up2Date
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.dll
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\refint\HoldMySteeringReceiver.dll
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.pdb
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.genruntimeconfig.cache
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\ref\HoldMySteeringReceiver.dll

@@ -40,11 +40,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\C Sharp\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
+      "projectUniqueName": "C:\\Hold My Steering\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
       "projectName": "HoldMySteeringReceiver",
-      "projectPath": "C:\\C Sharp\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
+      "projectPath": "C:\\Hold My Steering\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
       "packagesPath": "C:\\Users\\andar\\.nuget\\packages\\",
-      "outputPath": "C:\\C Sharp\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\obj\\",
+      "outputPath": "C:\\Hold My Steering\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -15,11 +15,23 @@ namespace HoldMySteeringReceiver
         private async void btnStart_Click(object sender, EventArgs e)
         {
             btnStart.Enabled = false;
+            btnClose.Enabled = true;
             lblStatus.Text = "Listening...";
 
             await server.StartAsync(
                 ProcessMessage);
         }
+
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            server.StopServer();
+
+            lblStatus.Text = "Server Closed";
+            btnClose.Enabled = false;
+            btnStart.Enabled = true;
+        }
+
 
         private void ProcessMessage(string msg)
         {
@@ -65,6 +77,7 @@ namespace HoldMySteeringReceiver
                 }
             });
         }
+
 
     }
 }

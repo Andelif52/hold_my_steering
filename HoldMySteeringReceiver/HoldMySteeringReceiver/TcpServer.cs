@@ -8,8 +8,10 @@ namespace HoldMySteeringReceiver
     {
         private TcpListener? listener;
 
-        public async Task StartAsync(
-            Action<string> onMessage)
+        private bool isRunning = false;
+
+
+        public async Task StartAsync(Action<string> onMessage)
         {
             listener =
                 new TcpListener(
@@ -18,33 +20,59 @@ namespace HoldMySteeringReceiver
 
             listener.Start();
 
-            while (true)
+            isRunning = true;
+
+
+            while (isRunning)
             {
-                var client =
-                    await listener
-                    .AcceptTcpClientAsync();
-
-                _ = Task.Run(async () =>
+                try
                 {
-                    var stream =
-                        client.GetStream();
+                    var client =
+                        await listener
+                        .AcceptTcpClientAsync();
 
-                    StreamReader reader =
-                        new StreamReader(stream);
 
-                    while (true)
+                    _ = Task.Run(async () =>
                     {
-                        string? msg =
-                            await reader
-                            .ReadLineAsync();
+                        var stream =
+                            client.GetStream();
 
-                        if (msg == null)
-                            break;
+                        StreamReader reader =
+                            new StreamReader(stream);
 
-                        onMessage(msg);
-                    }
-                });
+
+                        while (true)
+                        {
+                            string? msg =
+                                await reader
+                                .ReadLineAsync();
+
+                            if (msg == null)
+                                break;
+
+                            onMessage(msg);
+                        }
+
+                    });
+
+                }
+                catch (SocketException)
+                {
+                    // This happens when the server
+                    // is intentionally closed.
+
+                    break;
+                }
             }
         }
+
+
+        public void StopServer()
+        {
+            isRunning = false;
+
+            listener?.Stop();
+        }
+
     }
 }

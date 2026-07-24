@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "n/yOS7Mr9w8=",
+  "dgSpecHash": "3n6ynQDQvX0=",
   "success": true,
-  "projectFilePath": "C:\\C Sharp\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
+  "projectFilePath": "C:\\Hold My Steering\\HoldMySteeringReceiver\\HoldMySteeringReceiver\\HoldMySteeringReceiver.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\andar\\.nuget\\packages\\nefarius.vigem.client\\1.21.256\\nefarius.vigem.client.1.21.256.nupkg.sha512"
   ],
