@@ -9,13 +9,17 @@ import '../settings/controller_settings.dart';
 class ControllerScreen extends StatefulWidget {
   final Socket socket;
 
-  const ControllerScreen({super.key, required this.socket});
+  const ControllerScreen({
+    super.key,
+    required this.socket,
+  });
 
   @override
   State<ControllerScreen> createState() => _ControllerScreenState();
 }
 
 class _ControllerScreenState extends State<ControllerScreen> {
+
   double brakeStartY = 0;
   double throttleStartY = 0;
 
@@ -25,33 +29,32 @@ class _ControllerScreenState extends State<ControllerScreen> {
   double get steeringSensitivity =>
       ControllerSettings.steeringSensitivity / 100;
 
+
   late StreamSubscription<AccelerometerEvent>
       accelerometerSubscription;
 
-  // Swipe Sensitivity
 
   double getMaxSwipeDistance() {
+
     double sensitivity =
         ControllerSettings.getSwipeSensitivity();
 
-    // Convert 25%-100% into 0.0-1.0.
     double normalizedValue =
         (sensitivity - 25) / 75;
 
-    // 25% = 400 pixels
-    // 100% = 100 pixels
     return lerpDouble(
       400,
       100,
       normalizedValue,
-    )!
-        .toDouble();
+    )!.toDouble();
   }
 
+
   int calculatePercentage(
-    double startY,
-    double currentY,
-  ) {
+      double startY,
+      double currentY,
+      ) {
+
     double distance = startY - currentY;
 
     double percentage =
@@ -62,54 +65,69 @@ class _ControllerScreenState extends State<ControllerScreen> {
     return percentage.toInt();
   }
 
+
   int calculateSteering(double yValue) {
+
     const double maximumSensorValue = 10;
     const double maximumSteeringAngle = 95.0;
 
+
     print(yValue);
 
-    // Convert sensor value into steering angle.
+
     double steeringAngle =
         (yValue / maximumSensorValue) *
             maximumSteeringAngle;
 
-    // Apply steering sensitivity.
+
     steeringAngle *= steeringSensitivity;
 
-    // Maximum steering angle is fixed.
-    // steeringAngle =
-    // steeringAngle.clamp(-90.0, 90.0);
+
+    steeringAngle =
+        steeringAngle.clamp(-90.0, 90.0);
+
 
     return steeringAngle.round();
   }
 
+
   @override
   void initState() {
+
     super.initState();
 
+
     print("ControllerScreen initState called");
+
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
 
+
     accelerometerSubscription =
         accelerometerEventStream().listen(
               (event) {
+
             double yValue = event.y;
 
-            // Apply calibration only if available.
 
             if (ControllerSettings.getCalibrationStatus()) {
-              yValue = yValue -
-                  ControllerSettings.getSteeringOffset();
+
+              yValue =
+                  yValue -
+                      ControllerSettings
+                          .getSteeringOffset();
             }
+
 
             int steering =
             calculateSteering(yValue);
 
+
             print("STEER: $steering");
+
 
             widget.socket.write(
                 "STEER:$steering\n");
@@ -117,159 +135,308 @@ class _ControllerScreenState extends State<ControllerScreen> {
         );
   }
 
+
+
   @override
   void dispose() {
+
     accelerometerSubscription.cancel();
+
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
 
+
     super.dispose();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       backgroundColor: Colors.black,
+
+
       body: SafeArea(
-        child: Row(
+
+        child: Stack(
+
           children: [
 
-            // LEFT HALF = BRAKE
+            Row(
 
-            Expanded(
-              child: GestureDetector(
-                onVerticalDragStart: (details) {
-                  brakeStartY =
-                      details.localPosition.dy;
-                },
+              children: [
 
-                onVerticalDragUpdate: (details) {
-                  int percentage =
-                  calculatePercentage(
-                    brakeStartY,
-                    details.localPosition.dy,
-                  );
 
-                  setState(() {
-                    brakePercentage =
-                        percentage.toDouble();
-                  });
+                // LEFT HALF = BRAKE
 
-                  widget.socket.write(
-                      "BRAKE:$percentage\n");
-                },
+                Expanded(
 
-                onVerticalDragEnd: (_) {
-                  setState(() {
-                    brakePercentage = 0;
-                  });
+                  child: GestureDetector(
 
-                  widget.socket.write(
-                      "BRAKE:0\n");
-                },
+                    onVerticalDragStart: (details) {
 
-                child: Stack(
-                  children: [
-                    Container(
-                        color: Colors.black),
+                      brakeStartY =
+                          details.localPosition.dy;
+                    },
 
-                    Align(
-                      alignment:
-                      Alignment.bottomCenter,
-                      child: AnimatedContainer(
-                        duration:
-                        const Duration(
-                          milliseconds: 100,
+
+                    onVerticalDragUpdate: (details) {
+
+
+                      int percentage =
+                      calculatePercentage(
+                        brakeStartY,
+                        details.localPosition.dy,
+                      );
+
+
+                      setState(() {
+
+                        brakePercentage =
+                            percentage.toDouble();
+
+                      });
+
+
+                      widget.socket.write(
+                          "BRAKE:$percentage\n");
+
+                    },
+
+
+                    onVerticalDragEnd: (_) {
+
+
+                      setState(() {
+
+                        brakePercentage = 0;
+
+                      });
+
+
+                      widget.socket.write(
+                          "BRAKE:0\n");
+
+                    },
+
+
+                    child: Stack(
+
+                      children: [
+
+
+                        Container(
+                            color: Colors.black),
+
+
+
+                        Align(
+
+                          alignment:
+                          Alignment.bottomCenter,
+
+
+                          child: AnimatedContainer(
+
+                            duration:
+                            const Duration(
+                              milliseconds: 100,
+                            ),
+
+
+                            width:
+                            double.infinity,
+
+
+                            height:
+                            MediaQuery.of(context)
+                                .size
+                                .height *
+                                (brakePercentage / 100),
+
+
+                            color:
+                            Colors.red
+                                .withOpacity(0.7),
+
+                          ),
+
                         ),
 
-                        width:
-                        double.infinity,
+                      ],
 
-                        height:
-                        MediaQuery.of(context)
-                            .size
-                            .height *
-                            (brakePercentage / 100),
-
-                        color: Colors.red
-                            .withOpacity(0.7),
-                      ),
                     ),
-                  ],
+
+                  ),
+
                 ),
-              ),
-            ),
 
-            // RIGHT HALF = THROTTLE
 
-            Expanded(
-              child: GestureDetector(
-                onVerticalDragStart: (details) {
-                  throttleStartY =
-                      details.localPosition.dy;
-                },
 
-                onVerticalDragUpdate: (details) {
-                  int percentage =
-                  calculatePercentage(
-                    throttleStartY,
-                    details.localPosition.dy,
-                  );
 
-                  setState(() {
-                    throttlePercentage =
-                        percentage.toDouble();
-                  });
 
-                  widget.socket.write(
-                      "THROTTLE:$percentage\n");
-                },
+                // RIGHT HALF = THROTTLE
 
-                onVerticalDragEnd: (_) {
-                  setState(() {
-                    throttlePercentage = 0;
-                  });
 
-                  widget.socket.write(
-                      "THROTTLE:0\n");
-                },
+                Expanded(
 
-                child: Stack(
-                  children: [
-                    Container(
-                        color: Colors.black),
+                  child: GestureDetector(
 
-                    Align(
-                      alignment:
-                      Alignment.bottomCenter,
-                      child: AnimatedContainer(
-                        duration:
-                        const Duration(
-                          milliseconds: 100,
+                    onVerticalDragStart: (details) {
+
+                      throttleStartY =
+                          details.localPosition.dy;
+
+                    },
+
+
+                    onVerticalDragUpdate: (details) {
+
+
+                      int percentage =
+                      calculatePercentage(
+                        throttleStartY,
+                        details.localPosition.dy,
+                      );
+
+
+                      setState(() {
+
+                        throttlePercentage =
+                            percentage.toDouble();
+
+                      });
+
+
+                      widget.socket.write(
+                          "THROTTLE:$percentage\n");
+
+                    },
+
+
+                    onVerticalDragEnd: (_) {
+
+
+                      setState(() {
+
+                        throttlePercentage = 0;
+
+                      });
+
+
+                      widget.socket.write(
+                          "THROTTLE:0\n");
+
+                    },
+
+
+
+                    child: Stack(
+
+                      children: [
+
+
+                        Container(
+                            color: Colors.black),
+
+
+
+                        Align(
+
+                          alignment:
+                          Alignment.bottomCenter,
+
+
+                          child: AnimatedContainer(
+
+                            duration:
+                            const Duration(
+                              milliseconds: 100,
+                            ),
+
+
+                            width:
+                            double.infinity,
+
+
+                            height:
+                            MediaQuery.of(context)
+                                .size
+                                .height *
+                                (throttlePercentage / 100),
+
+
+                            color:
+                            Colors.green
+                                .withOpacity(0.7),
+
+                          ),
+
                         ),
 
-                        width:
-                        double.infinity,
+                      ],
 
-                        height:
-                        MediaQuery.of(context)
-                            .size
-                            .height *
-                            (throttlePercentage / 100),
-
-                        color: Colors.green
-                            .withOpacity(0.7),
-                      ),
                     ),
-                  ],
+
+                  ),
+
                 ),
-              ),
+
+
+              ],
+
             ),
+
+
+
+
+
+            // BACK BUTTON
+
+            Positioned(
+
+              top: 5,
+
+              right: 5,
+
+
+              child: IconButton(
+
+                icon: const Icon(
+
+                  Icons.arrow_back,
+
+                  color: Colors.white,
+
+                  size: 28,
+
+                ),
+
+
+                onPressed: () {
+
+                  Navigator.pop(context);
+
+                },
+
+              ),
+
+            ),
+
+
           ],
+
         ),
+
       ),
+
     );
+
   }
+
 }

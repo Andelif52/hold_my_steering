@@ -73,14 +73,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(
-                            "${steeringValues[index]}%"),
+                          "${steeringValues[index]}%",
+                        ),
 
-                        onTap: () {
-                          setState(() {
-                            ControllerSettings
-                                    .steeringSensitivity =
-                                steeringValues[index];
-                          });
+                        onTap: () async {
+
+                          await ControllerSettings
+                              .setSteeringSensitivity(
+                            steeringValues[index],
+                          );
+
+                          setState(() {});
 
                           Navigator.pop(context);
                         },
@@ -127,16 +130,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(
-                            "${swipeValues[index]}%"),
+                          "${swipeValues[index]}%",
+                        ),
 
-                        onTap: () {
-                          setState(() {
-                            ControllerSettings
-                                .setSwipeSensitivity(
-                              swipeValues[index]
-                                  .toDouble(),
-                            );
-                          });
+                        onTap: () async {
+
+                          await ControllerSettings
+                              .setSwipeSensitivity(
+                            swipeValues[index]
+                                .toDouble(),
+                          );
+
+                          setState(() {});
 
                           Navigator.pop(context);
                         },

@@ -5,7 +5,7 @@ import 'settings/controller_settings.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await ControllerSettings.loadCalibration();
+  await ControllerSettings.loadSettings();
 
   runApp(const HoldMySteeringApp());
 }

@@ -21,8 +21,17 @@ class ControllerSettings {
     return steeringSensitivity;
   }
 
-  static void setSteeringSensitivity(int value) {
+  static Future<void> setSteeringSensitivity(
+      int value) async {
     steeringSensitivity = value;
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setInt(
+      "steeringSensitivity",
+      value,
+    );
   }
 
   // Swipe Sensitivity
@@ -31,8 +40,17 @@ class ControllerSettings {
     return swipeSensitivity;
   }
 
-  static void setSwipeSensitivity(double value) {
+  static Future<void> setSwipeSensitivity(
+      double value) async {
     swipeSensitivity = value;
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setDouble(
+      "swipeSensitivity",
+      value,
+    );
   }
 
   // Steering Calibration
@@ -45,11 +63,13 @@ class ControllerSettings {
     return isCalibrated;
   }
 
-  static Future<void> setSteeringOffset(double value) async {
+  static Future<void> setSteeringOffset(
+      double value) async {
     steeringOffset = value;
     isCalibrated = true;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs =
+        await SharedPreferences.getInstance();
 
     await prefs.setDouble(
       "steeringCalibration",
@@ -62,21 +82,39 @@ class ControllerSettings {
     );
   }
 
-  static Future<void> loadCalibration() async {
-    final prefs = await SharedPreferences.getInstance();
+  // Load ALL settings when the app starts.
+
+  static Future<void> loadSettings() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    steeringSensitivity =
+        prefs.getInt(
+            "steeringSensitivity") ??
+            100;
+
+    swipeSensitivity =
+        prefs.getDouble(
+            "swipeSensitivity") ??
+            50;
 
     steeringOffset =
-        prefs.getDouble("steeringCalibration") ?? 0.0;
+        prefs.getDouble(
+            "steeringCalibration") ??
+            0.0;
 
     isCalibrated =
-        prefs.getBool("isCalibrated") ?? false;
+        prefs.getBool(
+            "isCalibrated") ??
+            false;
   }
 
   static Future<void> resetCalibration() async {
     steeringOffset = 0.0;
     isCalibrated = false;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs =
+        await SharedPreferences.getInstance();
 
     await prefs.setDouble(
       "steeringCalibration",
