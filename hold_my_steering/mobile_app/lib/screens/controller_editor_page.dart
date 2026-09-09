@@ -3,17 +3,25 @@ import 'package:flutter/services.dart';
 
 import '../models/controller_layout.dart';
 import '../services/default_layout_generator.dart';
+import '../services/layout_storage.dart';
 import '../widgets/xbox_abxy_button.dart';
 import '../widgets/analog_stick.dart';
 import '../widgets/dpad.dart';
 import '../widgets/editor_control_panel.dart';
+import '../widgets/layout_control_panel.dart';
+import '../widgets/add_button_dialog.dart';
+import '../widgets/save_layout_dialog.dart';
 
 
 
 class ControllerEditorPage extends StatefulWidget {
 
+    final ControllerLayout? existingLayout;
+
   const ControllerEditorPage({
     super.key,
+
+    this.existingLayout,
   });
 
 
@@ -37,9 +45,56 @@ class _ControllerEditorPageState
   ControllerButton? selectedButton;
 
 
+  final GlobalKey _layoutControlKey = GlobalKey();
+
+
   double screenWidth = 0;
 
   double screenHeight = 0;
+
+
+
+
+
+  final List<String> allControllerButtons = [
+
+
+    "A",
+
+    "B",
+
+    "X",
+
+    "Y",
+
+
+    "LB",
+
+    "RB",
+
+    "LT",
+
+    "RT",
+
+
+    "LEFT_STICK",
+
+    "RIGHT_STICK",
+
+
+    "DPAD",
+
+
+    "VIEW",
+
+    "MENU",
+
+
+  ];
+
+
+
+
 
 
 
@@ -129,14 +184,24 @@ class _ControllerEditorPageState
 
 
 
-    layout =
-        DefaultLayoutGenerator.create(
+    if(widget.existingLayout != null) {
 
-          screenWidth,
+        layout = widget.existingLayout;
 
-          screenHeight,
+      }
 
-        );
+      else {
+
+        layout =
+            DefaultLayoutGenerator.create(
+
+              screenWidth,
+
+              screenHeight,
+
+            );
+
+      }
 
 
   }
@@ -148,302 +213,25 @@ class _ControllerEditorPageState
 
 
 
-  Widget buildButton(
-      ControllerButton button
-      ) {
 
+  List<String> getAvailableButtons() {
 
-    bool isSelected =
-        selectedButton == button;
 
+    final existingButtons =
+        layout!.buttons
+            .map(
+              (button) => button.type,
+            )
+            .toList();
 
 
-    switch(button.type) {
 
-
-
-      case "A":
-
-      case "B":
-
-      case "X":
-
-      case "Y":
-
-
-        return XboxABXYButton(
-
-          label: button.type,
-
-          size: button.size,
-
-          opacity: button.opacity,
-
-          selected: isSelected,
-
-        );
-
-
-
-
-
-
-      case "LEFT_STICK":
-
-      case "RIGHT_STICK":
-
-
-        return AnalogStick(
-
-          size: button.size,
-
-          opacity: button.opacity,
-
-          selected: isSelected,
-
-        );
-
-
-
-
-
-
-
-      case "DPAD":
-
-
-        return DPad(
-
-          size: button.size,
-
-          opacity: button.opacity,
-
-          selected: isSelected,
-
-        );
-
-
-
-
-
-
-
-      case "LB":
-
-      case "RB":
-
-      case "LT":
-
-      case "RT":
-
-
-        return Opacity(
-
-          opacity: button.opacity,
-
-
-          child: Container(
-
-            width: button.size,
-
-            height: button.size / 2,
-
-
-            decoration: BoxDecoration(
-
-
-              color: Colors.black87,
-
-
-              borderRadius:
-
-                  BorderRadius.circular(15),
-
-
-
-              border: Border.all(
-
-
-                color: isSelected
-
-                    ? Colors.yellow
-
-                    : Colors.white,
-
-
-
-                width: isSelected
-
-                    ? 5
-
-                    : 3,
-
-
-              ),
-
-
-
-            ),
-
-
-
-
-
-            child: Center(
-
-
-              child: Text(
-
-
-                button.type,
-
-
-
-                style: const TextStyle(
-
-
-                  color: Colors.white,
-
-
-                  fontSize: 20,
-
-
-                  fontWeight:
-
-                      FontWeight.bold,
-
-
-                ),
-
-
-
-              ),
-
-
-
-            ),
-
-
-
-          ),
-
-        );
-
-
-
-
-
-
-
-
-     case "VIEW":
-
-     case "MENU":
-
-
-       return Opacity(
-
-         opacity: button.opacity,
-
-
-         child: Container(
-
-
-           width: button.size,
-
-           height: button.size,
-
-
-
-           decoration: BoxDecoration(
-
-
-             shape: BoxShape.circle,
-
-
-             color: Colors.black87,
-
-
-
-             border: Border.all(
-
-
-               color: isSelected
-
-                   ? Colors.yellow
-
-                   : Colors.white,
-
-
-               width: isSelected
-
-                   ? 4
-
-                   : 2,
-
-
-             ),
-
-
-
-           ),
-
-
-
-           child: Center(
-
-
-             child: Text(
-
-
-               button.type == "VIEW"
-
-                   ? "≡"
-
-                   : "☰",
-
-
-
-               style: const TextStyle(
-
-
-                 color: Colors.white,
-
-
-                 fontSize: 18,
-
-
-                 fontWeight:
-
-                     FontWeight.bold,
-
-
-               ),
-
-
-             ),
-
-
-
-           ),
-
-
-
-         ),
-
-       );
-
-
-
-
-
-
-      default:
-
-        return const SizedBox();
-
-
-    }
+    return allControllerButtons
+        .where(
+          (button) =>
+              !existingButtons.contains(button),
+        )
+        .toList();
 
 
   }
@@ -455,85 +243,42 @@ class _ControllerEditorPageState
 
 
 
-  void moveButton(
-      ControllerButton button,
-      DragUpdateDetails details,
-      ) {
+
+  void showAddButtonDialog() async {
 
 
-    setState(() {
-
-
-      double newX =
-          button.x + details.delta.dx;
-
-
-      double newY =
-          button.y + details.delta.dy;
+    final availableButtons =
+        getAvailableButtons();
 
 
 
+    final selectedType =
+        await showDialog<String>(
 
 
-      if(newX < 0) {
-
-        newX = 0;
-
-      }
+          context: context,
 
 
-
-      if(newY < 0) {
-
-        newY = 0;
-
-      }
+          builder: (context) {
 
 
+            return AddButtonDialog(
+
+              availableButtons:
+
+                  availableButtons,
+
+            );
 
 
-      if(newX + button.size > screenWidth) {
-
-        newX =
-            screenWidth - button.size;
-
-      }
+          },
 
 
-
-      if(newY + button.size > screenHeight) {
-
-        newY =
-            screenHeight - button.size;
-
-      }
+        );
 
 
 
-
-      button.x = newX;
-
-
-      button.y = newY;
-
-
-
-    });
-
-
-  }
-
-
-
-
-
-
-
-
-  void removeSelectedButton() {
-
-
-    if(selectedButton == null) {
+    if(selectedType == null) {
 
       return;
 
@@ -541,13 +286,48 @@ class _ControllerEditorPageState
 
 
 
+    addNewButton(selectedType);
+
+
+  }
+
+
+
+
+
+
+
+
+
+  void addNewButton(String type) {
+
+
+    final newButton =
+        ControllerButton(
+
+          type: type,
+
+          x: screenWidth / 2 - 50,
+
+          y: screenHeight / 2 - 50,
+
+          size: screenHeight * 0.20,
+
+          opacity: 1.0,
+
+          visible: true,
+
+        );
+
+
+
     setState(() {
 
 
-      layout!.buttons.remove(selectedButton);
+      layout!.buttons.add(newButton);
 
 
-      selectedButton = null;
+      selectedButton = newButton;
 
 
     });
@@ -555,283 +335,825 @@ class _ControllerEditorPageState
 
   }
 
+    void saveCurrentLayout() async {
+
+
+      if(layout == null) {
+
+        return;
+
+      }
 
 
 
 
+      final name =
+          await showDialog<String>(
 
 
+            context: context,
 
 
-  @override
-  Widget build(BuildContext context) {
+            builder: (context) {
 
 
-    return Scaffold(
-
-
-      backgroundColor: Colors.black87,
-
-
-
-      body: LayoutBuilder(
-
-
-        builder: (context,constraints) {
-
-
-
-          screenWidth =
-              constraints.maxWidth;
-
-
-
-          screenHeight =
-              constraints.maxHeight;
-
-
-
-          createLayoutIfReady();
-
-
-
-
-
-          if(layout == null) {
-
-
-            return const SizedBox();
-
-          }
-
-
-
-
-
-
-
-          return GestureDetector(
-
-
-
-            behavior:
-
-                HitTestBehavior.opaque,
-
-
-
-            onTap: () {
-
-
-              setState(() {
-
-
-                selectedButton = null;
-
-
-              });
+              return const SaveLayoutDialog();
 
 
             },
 
 
+          );
 
-            child: Stack(
 
 
+      if(name == null || name.isEmpty) {
 
-              children: [
+        return;
 
+      }
 
 
 
-                ...layout!.buttons.map(
 
+      setState(() {
 
 
-                  (button) {
+        layout!.name = name;
 
 
+      });
 
-                    return Positioned(
 
 
 
-                      left: button.x,
 
+      await LayoutStorage.saveLayout(
 
-                      top: button.y,
+        layout!,
 
+      );
 
 
-                      child: GestureDetector(
 
 
 
-                        onTap: () {
+      if(!mounted) {
 
+        return;
 
-                          setState(() {
+      }
 
 
-                            selectedButton = button;
 
 
-                          });
 
+      ScaffoldMessenger.of(context).showSnackBar(
 
-                        },
 
+        const SnackBar(
 
 
-                        onPanStart: (_) {
+          content: Text(
 
+            "Layout saved successfully",
 
-                          setState(() {
+          ),
 
 
-                            selectedButton = button;
+        ),
 
 
-                          });
+      );
 
 
-                        },
 
+    }
 
 
-                        onPanUpdate: (details) {
 
 
-                          moveButton(
 
-                            button,
 
-                            details,
 
-                          );
 
 
-                        },
+    Widget buildButton(
+        ControllerButton button
+        ) {
 
 
+      bool isSelected =
+          selectedButton == button;
 
-                        child:
 
-                            buildButton(button),
 
+      switch(button.type) {
 
 
-                      ),
 
+        case "A":
 
-                    );
+        case "B":
 
+        case "X":
 
-                  },
+        case "Y":
+
+
+          return XboxABXYButton(
+
+            label: button.type,
+
+            size: button.size,
+
+            opacity: button.opacity,
+
+            selected: isSelected,
+
+          );
+
+
+
+
+
+
+        case "LEFT_STICK":
+
+        case "RIGHT_STICK":
+
+
+          return AnalogStick(
+
+            size: button.size,
+
+            opacity: button.opacity,
+
+            selected: isSelected,
+
+          );
+
+
+
+
+
+
+
+        case "DPAD":
+
+
+          return DPad(
+
+            size: button.size,
+
+            opacity: button.opacity,
+
+            selected: isSelected,
+
+          );
+
+
+
+
+
+
+
+        case "LB":
+
+        case "RB":
+
+        case "LT":
+
+        case "RT":
+
+
+          return Opacity(
+
+            opacity: button.opacity,
+
+
+            child: Container(
+
+              width: button.size,
+
+              height: button.size / 2,
+
+
+              decoration: BoxDecoration(
+
+
+                color: Colors.black87,
+
+
+                borderRadius:
+
+                    BorderRadius.circular(15),
+
+
+
+                border: Border.all(
+
+
+                  color: isSelected
+
+                      ? Colors.yellow
+
+                      : Colors.white,
+
+
+
+                  width: isSelected
+
+                      ? 5
+
+                      : 3,
 
 
                 ),
 
 
 
+              ),
 
 
 
 
-                if(selectedButton != null)
+
+              child: Center(
 
 
-                  Positioned(
+                child: Text(
 
 
-                    top: 20,
-
-                    left: screenWidth / 2 - 150,
-
-
-                    child: EditorControlPanel(
-
-
-                      sizeValue:
-
-                          selectedButton!.size,
+                  button.type,
 
 
 
-                      opacityValue:
-
-                          selectedButton!.opacity,
+                  style: const TextStyle(
 
 
-
-                      onSizeChanged: (value) {
-
+                    color: Colors.white,
 
 
-                        setState(() {
+                    fontSize: 20,
 
 
-                          selectedButton!.size = value;
+                    fontWeight:
 
-
-                        });
-
-
-                      },
-
-
-
-                      onOpacityChanged: (value) {
-
-
-
-                        setState(() {
-
-
-                          selectedButton!.opacity = value;
-
-
-                        });
-
-
-                      },
-
-
-
-                      onRemove:
-
-                          removeSelectedButton,
-
-
-
-                    ),
+                        FontWeight.bold,
 
 
                   ),
 
 
 
-              ],
+                ),
+
+
+
+              ),
 
 
 
             ),
 
+          );
+
+
+
+
+
+
+
+
+        case "VIEW":
+
+        case "MENU":
+
+
+          return Opacity(
+
+            opacity: button.opacity,
+
+
+            child: Container(
+
+
+              width: button.size,
+
+              height: button.size,
+
+
+
+              decoration: BoxDecoration(
+
+
+                shape: BoxShape.circle,
+
+
+                color: Colors.black87,
+
+
+
+                border: Border.all(
+
+
+                  color: isSelected
+
+                      ? Colors.yellow
+
+                      : Colors.white,
+
+
+                  width: isSelected
+
+                      ? 4
+
+                      : 2,
+
+
+                ),
+
+
+
+              ),
+
+
+
+              child: Center(
+
+
+                child: Text(
+
+
+                  button.type == "VIEW"
+
+                      ? "≡"
+
+                      : "☰",
+
+
+
+                  style: const TextStyle(
+
+
+                    color: Colors.white,
+
+
+                    fontSize: 18,
+
+
+                    fontWeight:
+
+                        FontWeight.bold,
+
+
+                  ),
+
+
+                ),
+
+
+
+              ),
+
+
+
+            ),
 
           );
 
 
-        },
 
 
-      ),
 
 
-    );
+        default:
+
+          return const SizedBox();
 
 
-  }
+      }
 
 
-}
+    }
+
+      void moveButton(
+          ControllerButton button,
+          DragUpdateDetails details,
+          ) {
+
+
+        setState(() {
+
+
+          double newX =
+              button.x + details.delta.dx;
+
+
+          double newY =
+              button.y + details.delta.dy;
+
+
+
+
+
+          if(newX < 0) {
+
+            newX = 0;
+
+          }
+
+
+
+          if(newY < 0) {
+
+            newY = 0;
+
+          }
+
+
+
+
+          if(newX + button.size > screenWidth) {
+
+            newX =
+                screenWidth - button.size;
+
+          }
+
+
+
+          if(newY + button.size > screenHeight) {
+
+            newY =
+                screenHeight - button.size;
+
+          }
+
+
+
+
+          button.x = newX;
+
+
+          button.y = newY;
+
+
+
+        });
+
+
+      }
+
+
+
+
+
+
+
+
+      void removeSelectedButton() {
+
+
+        if(selectedButton == null) {
+
+          return;
+
+        }
+
+
+
+        setState(() {
+
+
+          layout!.buttons.remove(selectedButton);
+
+
+          selectedButton = null;
+
+
+        });
+
+
+      }
+
+
+
+
+
+
+
+
+
+      @override
+      Widget build(BuildContext context) {
+
+
+        return Scaffold(
+
+
+          backgroundColor: Colors.black87,
+
+
+
+          body: LayoutBuilder(
+
+
+            builder: (context,constraints) {
+
+
+
+              screenWidth =
+                  constraints.maxWidth;
+
+
+
+              screenHeight =
+                  constraints.maxHeight;
+
+
+
+              createLayoutIfReady();
+
+
+
+
+
+              if(layout == null) {
+
+
+                return const SizedBox();
+
+              }
+
+
+
+
+
+
+
+              return GestureDetector(
+
+
+
+                behavior:
+
+                    HitTestBehavior.opaque,
+
+
+
+                onTap: () {
+
+
+                  setState(() {
+
+
+                    selectedButton = null;
+
+
+                  });
+
+
+                },
+
+
+
+                child: Stack(
+
+
+
+                  children: [
+
+
+
+
+                    ...layout!.buttons.map(
+
+
+
+                      (button) {
+
+
+
+                        return Positioned(
+
+
+
+                          left: button.x,
+
+
+                          top: button.y,
+
+
+
+                          child: GestureDetector(
+
+
+
+                            onTap: () {
+
+
+                              setState(() {
+
+
+                                selectedButton = button;
+
+
+                              });
+
+
+                            },
+
+
+
+                            onPanStart: (_) {
+
+
+                              setState(() {
+
+
+                                selectedButton = button;
+
+
+                              });
+
+
+                            },
+
+
+
+                            onPanUpdate: (details) {
+
+
+                              moveButton(
+
+                                button,
+
+                                details,
+
+                              );
+
+
+                            },
+
+
+
+                            child:
+
+                                buildButton(button),
+
+
+
+                          ),
+
+
+                        );
+
+
+                      },
+
+
+                    ),
+
+
+
+
+
+
+
+                    if(selectedButton != null)
+
+
+                      Positioned(
+
+
+                        top: 20,
+
+                        left: screenWidth / 2 - 150,
+
+
+                        child: EditorControlPanel(
+
+
+                          sizeValue:
+
+                              selectedButton!.size,
+
+
+
+                          opacityValue:
+
+                              selectedButton!.opacity,
+
+
+
+                          onSizeChanged: (value) {
+
+
+
+                            setState(() {
+
+
+                              selectedButton!.size = value;
+
+
+                            });
+
+
+                          },
+
+
+
+                          onOpacityChanged: (value) {
+
+
+
+                            setState(() {
+
+
+                              selectedButton!.opacity = value;
+
+
+                            });
+
+
+                          },
+
+
+
+                          onRemove:
+
+                              removeSelectedButton,
+
+
+
+                        ),
+
+
+                      ),
+
+
+
+
+
+
+                    Positioned(
+
+
+                      bottom: 20,
+
+
+                      left: screenWidth / 2 - 130,
+
+
+
+                      child: LayoutControlPanel(
+
+
+                        key: _layoutControlKey,
+
+
+
+                        onAddButton:
+
+                            showAddButtonDialog,
+
+
+
+                        onSaveLayout:
+
+                            saveCurrentLayout,
+
+
+
+                      ),
+
+
+                    ),
+
+
+
+                  ],
+
+
+
+                ),
+
+
+              );
+
+
+            },
+
+
+          ),
+
+
+        );
+
+
+      }
+
+
+    }

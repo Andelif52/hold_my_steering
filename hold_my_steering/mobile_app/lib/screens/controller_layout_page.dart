@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'controller_editor_page.dart';
+import 'saved_layouts_page.dart';
+import 'remove_layouts_page.dart';
 
 
 
@@ -168,10 +170,59 @@ class ControllerLayoutPage extends StatelessWidget {
 
 
 
-                  onPressed: () {
+                  onPressed: () async {
 
 
-                    // Implement later
+                    final layout =
+                        await Navigator.push(
+
+
+                          context,
+
+
+                          MaterialPageRoute(
+
+
+                            builder: (context) =>
+                                const SavedLayoutsPage(),
+
+
+                          ),
+
+
+                        );
+
+
+
+                    if(layout != null && context.mounted) {
+
+
+                      Navigator.push(
+
+
+                        context,
+
+
+                        MaterialPageRoute(
+
+
+                          builder: (context) =>
+
+                              ControllerEditorPage(
+
+                                existingLayout: layout,
+
+                              ),
+
+
+                        ),
+
+
+                      );
+
+
+                    }
+
 
 
                   },
@@ -226,7 +277,18 @@ class ControllerLayoutPage extends StatelessWidget {
                   onPressed: () {
 
 
-                    // Implement later
+                    Navigator.push(
+
+                      context,
+
+                      MaterialPageRoute(
+
+                        builder: (context) =>
+                            const RemoveLayoutsPage(),
+
+                      ),
+
+                    );
 
 
                   },
