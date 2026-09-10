@@ -31,6 +31,10 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
   bool layoutLoadingStarted = false;
 
+  Map<String, bool> pressedButtons = {};
+
+  Map<String, bool> pressedDPad = {};
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +91,8 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
           opacity: button.opacity,
 
           selected: false,
+
+          pressed: pressedButtons[button.type] ?? false,
         );
 
       case "LEFT_STICK":
@@ -121,7 +127,13 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
           selected: false,
 
+          pressedDirections: pressedDPad,
+
           onDirection: (direction, pressed) {
+            setState(() {
+              pressedDPad[direction] = pressed;
+            });
+
             widget.socket.write("DPAD_$direction:${pressed ? 1 : 0}\n");
           },
         );
@@ -130,20 +142,46 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
       case "RB":
       case "LT":
       case "RT":
+        bool pressed = pressedButtons[button.type] ?? false;
+
+        double currentWidth = pressed ? button.size * 0.9 : button.size;
+
+        double currentHeight = pressed
+            ? (button.size / 2) * 0.9
+            : button.size / 2;
+
         return Opacity(
           opacity: button.opacity,
 
-          child: Container(
-            width: button.size,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 80),
 
-            height: button.size / 2,
+            width: currentWidth,
+
+            height: currentHeight,
 
             decoration: BoxDecoration(
               color: Colors.black87,
 
               borderRadius: BorderRadius.circular(15),
 
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(
+                color: pressed ? Colors.yellow : Colors.white,
+
+                width: pressed ? 5 : 3,
+              ),
+
+              boxShadow: [
+                BoxShadow(
+                  color: pressed
+                      ? Colors.yellow.withOpacity(0.8)
+                      : Colors.transparent,
+
+                  blurRadius: 15,
+
+                  spreadRadius: 3,
+                ),
+              ],
             ),
 
             child: Center(
@@ -164,20 +202,42 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
       case "VIEW":
       case "MENU":
+        bool pressed = pressedButtons[button.type] ?? false;
+
+        double currentSize = pressed ? button.size * 0.9 : button.size;
+
         return Opacity(
           opacity: button.opacity,
 
-          child: Container(
-            width: button.size,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 80),
 
-            height: button.size,
+            width: currentSize,
+
+            height: currentSize,
 
             decoration: BoxDecoration(
               shape: BoxShape.circle,
 
               color: Colors.black87,
 
-              border: Border.all(color: Colors.white, width: 2),
+              border: Border.all(
+                color: pressed ? Colors.yellow : Colors.white,
+
+                width: pressed ? 5 : 2,
+              ),
+
+              boxShadow: [
+                BoxShadow(
+                  color: pressed
+                      ? Colors.yellow.withOpacity(0.8)
+                      : Colors.transparent,
+
+                  blurRadius: 15,
+
+                  spreadRadius: 3,
+                ),
+              ],
             ),
 
             child: Center(
@@ -233,21 +293,33 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
                           child:
                               (button.type == "LEFT_STICK" ||
-                                  button.type == "RIGHT_STICK")
+                                  button.type == "RIGHT_STICK" ||
+                                  button.type == "DPAD")
                               ? buildButton(button)
                               : GestureDetector(
                                   onTapDown: (_) {
+                                    setState(() {
+                                      pressedButtons[button.type] = true;
+                                    });
+
                                     sendButtonCommand(button.type, true);
                                   },
 
                                   onTapUp: (_) {
+                                    setState(() {
+                                      pressedButtons[button.type] = false;
+                                    });
+
                                     sendButtonCommand(button.type, false);
                                   },
 
                                   onTapCancel: () {
+                                    setState(() {
+                                      pressedButtons[button.type] = false;
+                                    });
+
                                     sendButtonCommand(button.type, false);
                                   },
-
                                   child: buildButton(button),
                                 ),
                         );

@@ -13,6 +13,10 @@ class _SettingsPageState extends State<SettingsPage> {
   List<int> steeringValues = [];
   List<int> swipeValues = [];
 
+  List<int> analogDeadZoneValues = [];
+
+  List<int> analogSensitivityValues = [];
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +27,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
     for (int i = 25; i <= 100; i += 5) {
       swipeValues.add(i);
+    }
+
+    for (int i = 0; i <= 30; i += 5) {
+      analogDeadZoneValues.add(i);
+    }
+
+    for (int i = 50; i <= 200; i += 10) {
+      analogSensitivityValues.add(i);
     }
   }
 
@@ -39,28 +51,19 @@ class _SettingsPageState extends State<SettingsPage> {
 
       body: ListView(
         children: [
-
           // Steering Sensitivity
-
           ListTile(
             title: const Text(
               "Steering Sensitivity",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+              style: TextStyle(color: Colors.white),
             ),
 
             subtitle: Text(
               "${ControllerSettings.steeringSensitivity}%",
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
+              style: const TextStyle(color: Colors.grey),
             ),
 
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-            ),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
 
             onTap: () {
               showModalBottomSheet(
@@ -72,14 +75,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(
-                          "${steeringValues[index]}%",
-                        ),
+                        title: Text("${steeringValues[index]}%"),
 
                         onTap: () async {
-
-                          await ControllerSettings
-                              .setSteeringSensitivity(
+                          await ControllerSettings.setSteeringSensitivity(
                             steeringValues[index],
                           );
 
@@ -98,20 +97,60 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
 
           // Swipe Sensitivity
-
           ListTile(
             title: const Text(
               "Swipe Sensitivity",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+              style: TextStyle(color: Colors.white),
             ),
 
             subtitle: Text(
               "${ControllerSettings.swipeSensitivity.round()}%",
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
+              style: const TextStyle(color: Colors.grey),
+            ),
+
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+
+                builder: (context) {
+                  return ListView.builder(
+                    itemCount: swipeValues.length,
+
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text("${swipeValues[index]}%"),
+
+                        onTap: () async {
+                          await ControllerSettings.setSwipeSensitivity(
+                            swipeValues[index].toDouble(),
+                          );
+
+                          setState(() {});
+
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+
+                    const Divider(),
+
+          // Analog Dead Zone
+          ListTile(
+            title: const Text(
+              "Analog Dead Zone",
+              style: TextStyle(color: Colors.white),
+            ),
+
+            subtitle: Text(
+              "${ControllerSettings.analogDeadZone.round()}%",
+              style: const TextStyle(color: Colors.grey),
             ),
 
             trailing: const Icon(
@@ -125,19 +164,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 builder: (context) {
                   return ListView.builder(
-                    itemCount: swipeValues.length,
+                    itemCount: analogDeadZoneValues.length,
 
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(
-                          "${swipeValues[index]}%",
+                          "${analogDeadZoneValues[index]}%",
                         ),
 
                         onTap: () async {
-
                           await ControllerSettings
-                              .setSwipeSensitivity(
-                            swipeValues[index]
+                              .setAnalogDeadZone(
+                            analogDeadZoneValues[index]
                                 .toDouble(),
                           );
 
@@ -153,25 +191,20 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
 
+
           const Divider(),
 
-          // Steering Calibration
 
+          // Analog Sensitivity
           ListTile(
             title: const Text(
-              "Steering Calibration",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+              "Analog Sensitivity",
+              style: TextStyle(color: Colors.white),
             ),
 
             subtitle: Text(
-              ControllerSettings.getCalibrationStatus()
-                  ? "Calibrated"
-                  : "Not Calibrated",
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
+              "${ControllerSettings.analogSensitivity.round()}%",
+              style: const TextStyle(color: Colors.grey),
             ),
 
             trailing: const Icon(
@@ -179,13 +212,64 @@ class _SettingsPageState extends State<SettingsPage> {
               color: Colors.white,
             ),
 
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+
+                builder: (context) {
+                  return ListView.builder(
+                    itemCount: analogSensitivityValues.length,
+
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                          "${analogSensitivityValues[index]}%",
+                        ),
+
+                        onTap: () async {
+                          await ControllerSettings
+                              .setAnalogSensitivity(
+                            analogSensitivityValues[index]
+                                .toDouble(),
+                          );
+
+                          setState(() {});
+
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+
+
+          const Divider(),
+
+
+
+          // Steering Calibration
+          ListTile(
+            title: const Text(
+              "Steering Calibration",
+              style: TextStyle(color: Colors.white),
+            ),
+
+            subtitle: Text(
+              ControllerSettings.getCalibrationStatus()
+                  ? "Calibrated"
+                  : "Not Calibrated",
+              style: const TextStyle(color: Colors.grey),
+            ),
+
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+
             onTap: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const CalibrationPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const CalibrationPage()),
               );
 
               // Refresh the page after returning.
@@ -193,9 +277,12 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() {});
             },
           ),
-
         ],
       ),
     );
   }
+
+
+
+
 }

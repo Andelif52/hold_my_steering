@@ -15,6 +15,9 @@ class DPad extends StatelessWidget {
   final Function(String, bool)? onDirection;
 
 
+  final Map<String, bool> pressedDirections;
+
+
 
 
 
@@ -29,6 +32,8 @@ class DPad extends StatelessWidget {
     this.selected = false,
 
     this.onDirection,
+
+    this.pressedDirections = const {},
 
   });
 
@@ -45,6 +50,16 @@ class DPad extends StatelessWidget {
       IconData icon,
       double iconSize,
       ) {
+
+
+    bool pressed =
+        pressedDirections[direction] ?? false;
+
+
+
+    double offset =
+        pressed ? size * 0.03 : 0;
+
 
 
     return GestureDetector(
@@ -83,13 +98,64 @@ class DPad extends StatelessWidget {
 
 
 
-      child: Icon(
+      child: AnimatedContainer(
 
-        icon,
+        duration:
+            const Duration(milliseconds: 80),
 
-        color: Colors.white,
 
-        size: iconSize,
+        transform:
+            Matrix4.translationValues(
+              direction == "LEFT"
+                  ? offset
+                  : direction == "RIGHT"
+                      ? -offset
+                      : 0,
+
+              direction == "UP"
+                  ? offset
+                  : direction == "DOWN"
+                      ? -offset
+                      : 0,
+
+              0,
+            ),
+
+
+
+        child: Icon(
+
+          icon,
+
+
+          color: pressed
+
+              ? Colors.yellow
+
+              : Colors.white,
+
+
+          size: iconSize,
+
+
+          shadows: pressed
+
+              ? [
+
+                  Shadow(
+
+                    color:
+                        Colors.yellow.withOpacity(0.8),
+
+                    blurRadius: 10,
+
+                  ),
+
+                ]
+
+              : null,
+
+        ),
 
       ),
 

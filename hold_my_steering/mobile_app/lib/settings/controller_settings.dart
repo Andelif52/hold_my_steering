@@ -15,23 +15,48 @@ class ControllerSettings {
 
   static bool isCalibrated = false;
 
+  // Analog Stick Settings
+
+  static double analogDeadZone = 10;
+
+  static double analogSensitivity = 100;
+
+  static double getAnalogDeadZone() {
+    return analogDeadZone;
+  }
+
+  static double getAnalogSensitivity() {
+    return analogSensitivity;
+  }
+
+  static Future<void> setAnalogDeadZone(double value) async {
+    analogDeadZone = value;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setDouble("analogDeadZone", value);
+  }
+
+  static Future<void> setAnalogSensitivity(double value) async {
+    analogSensitivity = value;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setDouble("analogSensitivity", value);
+  }
+
   // Steering Sensitivity
 
   static int getSteeringSensitivity() {
     return steeringSensitivity;
   }
 
-  static Future<void> setSteeringSensitivity(
-      int value) async {
+  static Future<void> setSteeringSensitivity(int value) async {
     steeringSensitivity = value;
 
-    final prefs =
-        await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt(
-      "steeringSensitivity",
-      value,
-    );
+    await prefs.setInt("steeringSensitivity", value);
   }
 
   // Swipe Sensitivity
@@ -40,17 +65,12 @@ class ControllerSettings {
     return swipeSensitivity;
   }
 
-  static Future<void> setSwipeSensitivity(
-      double value) async {
+  static Future<void> setSwipeSensitivity(double value) async {
     swipeSensitivity = value;
 
-    final prefs =
-        await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setDouble(
-      "swipeSensitivity",
-      value,
-    );
+    await prefs.setDouble("swipeSensitivity", value);
   }
 
   // Steering Calibration
@@ -63,67 +83,43 @@ class ControllerSettings {
     return isCalibrated;
   }
 
-  static Future<void> setSteeringOffset(
-      double value) async {
+  static Future<void> setSteeringOffset(double value) async {
     steeringOffset = value;
     isCalibrated = true;
 
-    final prefs =
-        await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setDouble(
-      "steeringCalibration",
-      value,
-    );
+    await prefs.setDouble("steeringCalibration", value);
 
-    await prefs.setBool(
-      "isCalibrated",
-      true,
-    );
+    await prefs.setBool("isCalibrated", true);
   }
 
   // Load ALL settings when the app starts.
 
   static Future<void> loadSettings() async {
-    final prefs =
-        await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    steeringSensitivity =
-        prefs.getInt(
-            "steeringSensitivity") ??
-            100;
+    steeringSensitivity = prefs.getInt("steeringSensitivity") ?? 100;
 
-    swipeSensitivity =
-        prefs.getDouble(
-            "swipeSensitivity") ??
-            50;
+    swipeSensitivity = prefs.getDouble("swipeSensitivity") ?? 50;
 
-    steeringOffset =
-        prefs.getDouble(
-            "steeringCalibration") ??
-            0.0;
+    steeringOffset = prefs.getDouble("steeringCalibration") ?? 0.0;
 
-    isCalibrated =
-        prefs.getBool(
-            "isCalibrated") ??
-            false;
+    isCalibrated = prefs.getBool("isCalibrated") ?? false;
+
+    analogDeadZone = prefs.getDouble("analogDeadZone") ?? 10;
+
+    analogSensitivity = prefs.getDouble("analogSensitivity") ?? 100;
   }
 
   static Future<void> resetCalibration() async {
     steeringOffset = 0.0;
     isCalibrated = false;
 
-    final prefs =
-        await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setDouble(
-      "steeringCalibration",
-      0.0,
-    );
+    await prefs.setDouble("steeringCalibration", 0.0);
 
-    await prefs.setBool(
-      "isCalibrated",
-      false,
-    );
+    await prefs.setBool("isCalibrated", false);
   }
 }

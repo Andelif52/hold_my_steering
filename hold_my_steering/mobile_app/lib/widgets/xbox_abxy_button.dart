@@ -12,6 +12,8 @@ class XboxABXYButton extends StatelessWidget {
 
   final bool selected;
 
+  final bool pressed;
+
 
 
   const XboxABXYButton({
@@ -25,6 +27,8 @@ class XboxABXYButton extends StatelessWidget {
     this.opacity = 1.0,
 
     this.selected = false,
+
+    this.pressed = false,
 
   });
 
@@ -83,6 +87,12 @@ class XboxABXYButton extends StatelessWidget {
         getButtonColor();
 
 
+    double currentSize =
+        pressed
+            ? size * 0.90
+            : size;
+
+
 
 
     return Opacity(
@@ -92,12 +102,17 @@ class XboxABXYButton extends StatelessWidget {
 
 
 
-      child: Container(
+      child: AnimatedContainer(
 
 
-        width: size,
+        duration:
+            const Duration(milliseconds: 80),
 
-        height: size,
+
+
+        width: currentSize,
+
+        height: currentSize,
 
 
 
@@ -119,13 +134,21 @@ class XboxABXYButton extends StatelessWidget {
 
 
             color: selected
+
                 ? Colors.yellow
+
                 : buttonColor,
 
 
             width: selected
+
                 ? 6
-                : 4,
+
+                : pressed
+
+                    ? 6
+
+                    : 4,
 
 
           ),
@@ -139,19 +162,35 @@ class XboxABXYButton extends StatelessWidget {
 
 
               color:
-                  selected
-                      ? Colors.yellow
-                      .withOpacity(0.8)
 
-                      : buttonColor
-                      .withOpacity(0.5),
+                  pressed
+
+                      ? buttonColor.withOpacity(0.9)
+
+                      : selected
+
+                          ? Colors.yellow.withOpacity(0.8)
+
+                          : buttonColor.withOpacity(0.5),
 
 
 
-              blurRadius: 15,
+              blurRadius:
+
+                  pressed
+
+                      ? 20
+
+                      : 15,
 
 
-              spreadRadius: 3,
+              spreadRadius:
+
+                  pressed
+
+                      ? 5
+
+                      : 3,
 
 
             ),
@@ -185,7 +224,7 @@ class XboxABXYButton extends StatelessWidget {
 
 
               fontSize:
-                  size * 0.35,
+                  currentSize * 0.35,
 
 
 

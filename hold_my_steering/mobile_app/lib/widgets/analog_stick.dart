@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../settings/controller_settings.dart';
 
 class AnalogStick extends StatefulWidget {
   final double size;
@@ -33,12 +34,37 @@ class AnalogStick extends StatefulWidget {
   State<AnalogStick> createState() => _AnalogStickState();
 }
 
-class _AnalogStickState extends State<AnalogStick> {
+class _AnalogStickState extends State<AnalogStick>
+    with SingleTickerProviderStateMixin {
   double knobX = 0;
 
   double knobY = 0;
 
+  bool active = false;
+
+  AnimationController? controller;
+
+  Animation<double>? animationX;
+
+  Animation<double>? animationY;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
   void updateStick(Offset position) {
+    controller?.stop();
+
+    setState(() {
+      active = true;
+    });
+
     double maxDistance = widget.size * 0.275;
 
     double center = widget.size / 2;
@@ -63,21 +89,75 @@ class _AnalogStickState extends State<AnalogStick> {
       knobY = y;
     });
 
-    double outputX = (x / maxDistance) * 100;
+    double normalizedX = x / maxDistance;
 
-    double outputY = (y / maxDistance) * 100;
+    double normalizedY = y / maxDistance;
+
+    double magnitude = Offset(normalizedX, normalizedY).distance;
+
+    if (magnitude < ControllerSettings.analogDeadZone / 100) {
+      normalizedX = 0;
+
+      normalizedY = 0;
+    } else {
+      double adjustedMagnitude =
+          (magnitude - ControllerSettings.analogDeadZone / 100) /
+          (1 - ControllerSettings.analogDeadZone / 100);
+
+      adjustedMagnitude = adjustedMagnitude.clamp(0, 1);
+
+      double scale = adjustedMagnitude / magnitude;
+
+      normalizedX *= scale;
+
+      normalizedY *= scale;
+    }
+
+    double sensitivity = ControllerSettings.analogSensitivity / 100;
+
+    normalizedX *= sensitivity;
+
+    normalizedY *= sensitivity;
+
+    double outputX = normalizedX * 100;
+
+    double outputY = normalizedY * 100;
 
     widget.onMove?.call(outputX.clamp(-100, 100), outputY.clamp(-100, 100));
   }
 
-  void resetStick() {
-    setState(() {
-      knobX = 0;
 
-      knobY = 0;
+
+  void resetStick() {
+    animationX = Tween<double>(begin: knobX, end: 0).animate(controller!);
+
+    animationY = Tween<double>(begin: knobY, end: 0).animate(controller!);
+
+    controller?.forward(from: 0);
+    controller!.addListener(() {
+      setState(() {
+        knobX = animationX!.value;
+
+        knobY = animationY!.value;
+      });
+    });
+
+    controller!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          active = false;
+        });
+      }
     });
 
     widget.onRelease?.call();
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -105,13 +185,11 @@ class _AnalogStickState extends State<AnalogStick> {
 
           boxShadow: [
             BoxShadow(
-              color: widget.selected
-                  ? Colors.yellow.withOpacity(0.7)
-                  : Colors.transparent,
+              color: active ? Colors.blue.withOpacity(0.6) : Colors.transparent,
 
-              blurRadius: 15,
+              blurRadius: 20,
 
-              spreadRadius: 3,
+              spreadRadius: 5,
             ),
           ],
         ),
@@ -123,17 +201,23 @@ class _AnalogStickState extends State<AnalogStick> {
 
               top: (widget.size - knobSize) / 2 + knobY,
 
-              child: Container(
-                width: knobSize,
+              child: AnimatedScale(
+                scale: active ? 0.92 : 1.0,
 
-                height: knobSize,
+                duration: const Duration(milliseconds: 80),
 
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                child: Container(
+                  width: knobSize,
 
-                  color: Colors.black87,
+                  height: knobSize,
 
-                  border: Border.all(color: Colors.white54, width: 3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+
+                    color: Colors.black87,
+
+                    border: Border.all(color: Colors.white54, width: 3),
+                  ),
                 ),
               ),
             ),
