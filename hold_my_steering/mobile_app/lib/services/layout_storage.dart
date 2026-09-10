@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/controller_layout.dart';
 
@@ -142,6 +143,45 @@ class LayoutStorage {
 
     }
 
+
+  }
+
+
+
+
+
+  // Save currently selected controller layout
+
+  static Future<void> saveCurrentLayout(
+      String layoutName
+      ) async {
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+
+    await prefs.setString(
+      "currentControllerLayout",
+      layoutName,
+    );
+
+  }
+
+
+
+
+
+  // Get currently selected controller layout
+
+  static Future<String?> getCurrentLayout() async {
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+
+    return prefs.getString(
+      "currentControllerLayout",
+    );
 
   }
 

@@ -8,8 +8,15 @@ import '../services/layout_storage.dart';
 class SavedLayoutsPage extends StatefulWidget {
 
 
+  final bool selectionMode;
+
+
   const SavedLayoutsPage({
+
     super.key,
+
+    this.selectionMode = false,
+
   });
 
 
@@ -31,6 +38,9 @@ class _SavedLayoutsPageState
 
 
   List<String> layouts = [];
+
+
+  String? currentLayout;
 
 
   bool loading = true;
@@ -64,10 +74,25 @@ class _SavedLayoutsPageState
 
 
 
+    String? selectedLayout;
+
+
+
+    if(widget.selectionMode) {
+
+      selectedLayout =
+          await LayoutStorage.getCurrentLayout();
+
+    }
+
+
+
     setState(() {
 
 
       layouts = savedLayouts;
+
+      currentLayout = selectedLayout;
 
       loading = false;
 
@@ -86,6 +111,33 @@ class _SavedLayoutsPageState
 
 
   Future<void> openLayout(String name) async {
+
+
+    if(widget.selectionMode) {
+
+
+      await LayoutStorage.saveCurrentLayout(
+        name,
+      );
+
+
+      setState(() {
+
+
+        currentLayout = name;
+
+
+      });
+
+
+
+      return;
+
+    }
+
+
+
+
 
 
     final ControllerLayout? layout =
@@ -142,9 +194,13 @@ class _SavedLayoutsPageState
       appBar: AppBar(
 
 
-        title: const Text(
+        title: Text(
 
-          "Edit Existing Configuration",
+          widget.selectionMode
+
+              ? "Select Current Configuration"
+
+              : "Edit Existing Configuration",
 
         ),
 
@@ -292,16 +348,29 @@ class _SavedLayoutsPageState
 
                         trailing:
 
-                            const Icon(
+                            widget.selectionMode
 
+                                ? Icon(
 
-                              Icons.edit,
+                                    Icons.check_circle,
 
+                                    color:
 
-                              color: Colors.white,
+                                        currentLayout == name
 
+                                            ? Colors.green
 
-                            ),
+                                            : Colors.white,
+
+                                  )
+
+                                : const Icon(
+
+                                    Icons.edit,
+
+                                    color: Colors.white,
+
+                                  ),
 
 
 

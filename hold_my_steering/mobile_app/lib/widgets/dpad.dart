@@ -12,6 +12,11 @@ class DPad extends StatelessWidget {
   final bool selected;
 
 
+  final Function(String, bool)? onDirection;
+
+
+
+
 
   const DPad({
 
@@ -23,7 +28,77 @@ class DPad extends StatelessWidget {
 
     this.selected = false,
 
+    this.onDirection,
+
   });
+
+
+
+
+
+
+
+
+
+  Widget directionButton(
+      String direction,
+      IconData icon,
+      double iconSize,
+      ) {
+
+
+    return GestureDetector(
+
+
+      onTapDown: (_) {
+
+        onDirection?.call(
+          direction,
+          true,
+        );
+
+      },
+
+
+
+      onTapUp: (_) {
+
+        onDirection?.call(
+          direction,
+          false,
+        );
+
+      },
+
+
+
+      onTapCancel: () {
+
+        onDirection?.call(
+          direction,
+          false,
+        );
+
+      },
+
+
+
+      child: Icon(
+
+        icon,
+
+        color: Colors.white,
+
+        size: iconSize,
+
+      ),
+
+    );
+
+
+  }
+
+
 
 
 
@@ -69,13 +144,17 @@ class DPad extends StatelessWidget {
 
 
             color: selected
+
                 ? Colors.yellow
+
                 : Colors.white,
 
 
 
             width: selected
+
                 ? 5
+
                 : 3,
 
 
@@ -137,16 +216,13 @@ class DPad extends StatelessWidget {
               top: size * 0.05,
 
 
-              child: Icon(
+              child: directionButton(
+
+                "UP",
 
                 Icons.keyboard_arrow_up,
 
-
-                color: Colors.white,
-
-
-                size: size * 0.28,
-
+                size * 0.28,
 
               ),
 
@@ -164,16 +240,13 @@ class DPad extends StatelessWidget {
               bottom: size * 0.05,
 
 
-              child: Icon(
+              child: directionButton(
+
+                "DOWN",
 
                 Icons.keyboard_arrow_down,
 
-
-                color: Colors.white,
-
-
-                size: size * 0.28,
-
+                size * 0.28,
 
               ),
 
@@ -191,16 +264,13 @@ class DPad extends StatelessWidget {
               left: size * 0.05,
 
 
-              child: Icon(
+              child: directionButton(
+
+                "LEFT",
 
                 Icons.keyboard_arrow_left,
 
-
-                color: Colors.white,
-
-
-                size: size * 0.28,
-
+                size * 0.28,
 
               ),
 
@@ -218,16 +288,13 @@ class DPad extends StatelessWidget {
               right: size * 0.05,
 
 
-              child: Icon(
+              child: directionButton(
+
+                "RIGHT",
 
                 Icons.keyboard_arrow_right,
 
-
-                color: Colors.white,
-
-
-                size: size * 0.28,
-
+                size * 0.28,
 
               ),
 
@@ -273,6 +340,7 @@ class DPad extends StatelessWidget {
 
 
               ),
+
 
 
             ),

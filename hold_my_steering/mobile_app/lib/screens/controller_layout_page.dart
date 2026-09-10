@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'controller_editor_page.dart';
 import 'saved_layouts_page.dart';
 import 'remove_layouts_page.dart';
+import '../services/layout_storage.dart';
 
 
 
@@ -65,6 +66,94 @@ class ControllerLayoutPage extends StatelessWidget {
 
 
             children: [
+
+
+
+
+
+              // CURRENT SELECTED CONFIGURATION
+
+
+              SizedBox(
+
+
+                width: double.infinity,
+
+
+                height: 65,
+
+
+
+                child: ElevatedButton(
+
+
+                  child: const Text(
+
+
+                    "Current Selected Configuration",
+
+
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+
+
+                  ),
+
+
+
+                  onPressed: () async {
+
+
+                    final layoutName =
+                        await Navigator.push(
+
+
+                          context,
+
+
+                          MaterialPageRoute(
+
+
+                            builder: (context) =>
+                                const SavedLayoutsPage(
+                                  selectionMode: true,
+                                ),
+
+
+                          ),
+
+
+                        );
+
+
+
+                    if(layoutName != null) {
+
+
+                      await LayoutStorage
+                          .saveCurrentLayout(
+                            layoutName,
+                          );
+
+                    }
+
+
+
+                  },
+
+
+                ),
+
+
+              ),
+
+
+
+
+
+              const SizedBox(height: 30),
+
 
 
 

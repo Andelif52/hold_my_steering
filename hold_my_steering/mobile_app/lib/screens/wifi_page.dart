@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'controller_screen.dart';
+import 'mode_selection_page.dart';
 
 class WifiPage extends StatefulWidget {
   const WifiPage({super.key});
@@ -40,11 +40,11 @@ class _WifiPageState extends State<WifiPage> {
       // Send a test message
       socket!.write("Hello from Hold My Steering!\n");
 
-      // Go to controller screen
+      // Go to mode selection screen
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ControllerScreen(
+          builder: (context) => ModeSelectionPage(
             socket: socket!,
           ),
         ),
