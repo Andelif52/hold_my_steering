@@ -134,6 +134,11 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
   }
 
   void addNewButton(String type) {
+
+    if (type == "RIGHT_STICK") {
+      layout!.rightStickFullScreen = false;
+    }
+    
     final newButton = ControllerButton(
       type: type,
 
@@ -206,7 +211,19 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
         );
 
       case "LEFT_STICK":
+        return AnalogStick(
+          size: button.size,
+
+          opacity: button.opacity,
+
+          selected: isSelected,
+        );
+
       case "RIGHT_STICK":
+        if (button.fullScreen) {
+          return const SizedBox();
+        }
+
         return AnalogStick(
           size: button.size,
 
@@ -384,33 +401,38 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
 
             child: Stack(
               children: [
-                ...layout!.buttons.map((button) {
-                  return Positioned(
-                    left: button.x,
+                ...layout!.buttons
+                    .where(
+                      (button) =>
+                          !(button.type == "RIGHT_STICK" && button.fullScreen),
+                    )
+                    .map((button) {
+                      return Positioned(
+                        left: button.x,
 
-                    top: button.y,
+                        top: button.y,
 
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedButton = button;
-                        });
-                      },
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedButton = button;
+                            });
+                          },
 
-                      onPanStart: (_) {
-                        setState(() {
-                          selectedButton = button;
-                        });
-                      },
+                          onPanStart: (_) {
+                            setState(() {
+                              selectedButton = button;
+                            });
+                          },
 
-                      onPanUpdate: (details) {
-                        moveButton(button, details);
-                      },
+                          onPanUpdate: (details) {
+                            moveButton(button, details);
+                          },
 
-                      child: buildButton(button),
-                    ),
-                  );
-                }),
+                          child: buildButton(button),
+                        ),
+                      );
+                    }),
 
                 if (selectedButton != null)
                   Positioned(
@@ -422,6 +444,8 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
                       sizeValue: selectedButton!.size,
 
                       opacityValue: selectedButton!.opacity,
+
+                      buttonType: selectedButton!.type,
 
                       onSizeChanged: (value) {
                         setState(() {
@@ -436,6 +460,16 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
                       },
 
                       onRemove: removeSelectedButton,
+
+                      onMakeFullScreen: () {
+                        setState(() {
+                          layout!.rightStickFullScreen = true;
+
+                          layout!.buttons.remove(selectedButton);
+
+                          selectedButton = null;
+                        });
+                      },
                     ),
                   ),
 

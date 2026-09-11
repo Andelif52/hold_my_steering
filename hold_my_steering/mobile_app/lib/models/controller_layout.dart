@@ -2,37 +2,36 @@ class ControllerLayout {
   String name;
   List<ControllerButton> buttons;
 
+  bool rightStickFullScreen;
+
   ControllerLayout({
     required this.name,
     required this.buttons,
+    this.rightStickFullScreen = false,
   });
-
 
   Map<String, dynamic> toJson() {
     return {
       "name": name,
       "buttons": buttons.map((button) => button.toJson()).toList(),
+      "rightStickFullScreen": rightStickFullScreen,
     };
   }
-
 
   factory ControllerLayout.fromJson(Map<String, dynamic> json) {
     return ControllerLayout(
       name: json["name"],
 
       buttons: (json["buttons"] as List)
-          .map(
-            (button) => ControllerButton.fromJson(button),
-          )
+          .map((button) => ControllerButton.fromJson(button))
           .toList(),
+
+      rightStickFullScreen: json["rightStickFullScreen"] ?? false,
     );
   }
 }
 
-
-
 class ControllerButton {
-
   String type;
 
   double x;
@@ -44,9 +43,9 @@ class ControllerButton {
 
   bool visible;
 
+  bool fullScreen;
 
   ControllerButton({
-
     required this.type,
 
     required this.x,
@@ -59,14 +58,11 @@ class ControllerButton {
 
     required this.visible,
 
+    this.fullScreen = false,
   });
 
-
-
   Map<String, dynamic> toJson() {
-
     return {
-
       "type": type,
 
       "x": x,
@@ -79,16 +75,12 @@ class ControllerButton {
 
       "visible": visible,
 
+      "fullScreen": fullScreen,
     };
-
   }
 
-
-
   factory ControllerButton.fromJson(Map<String, dynamic> json) {
-
     return ControllerButton(
-
       type: json["type"],
 
       x: json["x"],
@@ -101,8 +93,7 @@ class ControllerButton {
 
       visible: json["visible"],
 
+      fullScreen: json["fullScreen"] ?? false,
     );
-
   }
-
 }

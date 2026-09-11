@@ -21,12 +21,20 @@ class ControllerSettings {
 
   static double analogSensitivity = 100;
 
+  // View Sensitivity
+
+  static double viewSensitivity = 50;
+
   static double getAnalogDeadZone() {
     return analogDeadZone;
   }
 
   static double getAnalogSensitivity() {
     return analogSensitivity;
+  }
+
+  static double getViewSensitivity() {
+    return viewSensitivity;
   }
 
   static Future<void> setAnalogDeadZone(double value) async {
@@ -43,6 +51,14 @@ class ControllerSettings {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setDouble("analogSensitivity", value);
+  }
+
+  static Future<void> setViewSensitivity(double value) async {
+    viewSensitivity = value;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setDouble("viewSensitivity", value);
   }
 
   // Steering Sensitivity
@@ -110,6 +126,8 @@ class ControllerSettings {
     analogDeadZone = prefs.getDouble("analogDeadZone") ?? 10;
 
     analogSensitivity = prefs.getDouble("analogSensitivity") ?? 100;
+
+    viewSensitivity = prefs.getDouble("viewSensitivity") ?? 50;
   }
 
   static Future<void> resetCalibration() async {

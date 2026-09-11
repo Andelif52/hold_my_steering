@@ -13,6 +13,8 @@ import '../widgets/dpad.dart';
 
 import '../widgets/switch_button.dart';
 import 'controller_screen.dart';
+import '../settings/controller_settings.dart';
+
 
 class GameControllerScreen extends StatefulWidget {
   final Socket socket;
@@ -39,6 +41,10 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
   Map<String, bool> pressedButtons = {};
 
   Map<String, bool> pressedDPad = {};
+
+  Offset? viewStartPosition;
+
+  bool viewActive = false;
 
   @override
   void initState() {
@@ -80,6 +86,36 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
   void sendButtonCommand(String button, bool pressed) {
     widget.socket.write("$button:${pressed ? 1 : 0}\n");
+  }
+
+  void sendViewMovement(Offset currentPosition) {
+    if (viewStartPosition == null) {
+      return;
+    }
+
+    double deltaX = currentPosition.dx - viewStartPosition!.dx;
+
+    double deltaY = currentPosition.dy - viewStartPosition!.dy;
+
+    double sensitivity = ControllerSettings.viewSensitivity / 100;
+
+    double x = (deltaX * sensitivity).clamp(-100, 100);
+
+    double y = (deltaY * sensitivity).clamp(-100, 100);
+
+    widget.socket.write("RIGHT_STICK_X:${x.round()}\n");
+
+    widget.socket.write("RIGHT_STICK_Y:${y.round()}\n");
+  }
+
+  void releaseView() {
+    viewStartPosition = null;
+
+    viewActive = false;
+
+    widget.socket.write("RIGHT_STICK_X:0\n");
+
+    widget.socket.write("RIGHT_STICK_Y:0\n");
   }
 
   Widget buildButton(ControllerButton button) {
@@ -299,6 +335,37 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
               : SafeArea(
                   child: Stack(
                     children: [
+                      if (layout!.rightStickFullScreen)
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+
+                            onPanStart: (details) {
+                              viewStartPosition = details.localPosition;
+
+                              viewActive = true;
+
+                              widget.socket.write("RIGHT_STICK_X:0\n");
+
+                              widget.socket.write("RIGHT_STICK_Y:0\n");
+                            },
+
+                            onPanUpdate: (details) {
+                              if (viewActive) {
+                                sendViewMovement(details.localPosition);
+                              }
+                            },
+
+                            onPanEnd: (_) {
+                              releaseView();
+                            },
+
+                            onPanCancel: () {
+                              releaseView();
+                            },
+                          ),
+                        ),
+
                       ...layout!.buttons.map((button) {
                         return Positioned(
                           left: button.x,

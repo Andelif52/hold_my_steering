@@ -17,6 +17,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   List<int> analogSensitivityValues = [];
 
+  List<int> viewSensitivityValues = [];
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +37,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
     for (int i = 50; i <= 200; i += 10) {
       analogSensitivityValues.add(i);
+    }
+
+    for (int i = 25; i <= 200; i += 10) {
+      viewSensitivityValues.add(i);
     }
   }
 
@@ -139,7 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
 
-                    const Divider(),
+          const Divider(),
 
           // Analog Dead Zone
           ListTile(
@@ -153,10 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
               style: const TextStyle(color: Colors.grey),
             ),
 
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-            ),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
 
             onTap: () {
               showModalBottomSheet(
@@ -168,15 +171,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(
-                          "${analogDeadZoneValues[index]}%",
-                        ),
+                        title: Text("${analogDeadZoneValues[index]}%"),
 
                         onTap: () async {
-                          await ControllerSettings
-                              .setAnalogDeadZone(
-                            analogDeadZoneValues[index]
-                                .toDouble(),
+                          await ControllerSettings.setAnalogDeadZone(
+                            analogDeadZoneValues[index].toDouble(),
                           );
 
                           setState(() {});
@@ -191,9 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
 
-
           const Divider(),
-
 
           // Analog Sensitivity
           ListTile(
@@ -207,10 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
               style: const TextStyle(color: Colors.grey),
             ),
 
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-            ),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
 
             onTap: () {
               showModalBottomSheet(
@@ -222,15 +216,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(
-                          "${analogSensitivityValues[index]}%",
-                        ),
+                        title: Text("${analogSensitivityValues[index]}%"),
 
                         onTap: () async {
-                          await ControllerSettings
-                              .setAnalogSensitivity(
-                            analogSensitivityValues[index]
-                                .toDouble(),
+                          await ControllerSettings.setAnalogSensitivity(
+                            analogSensitivityValues[index].toDouble(),
                           );
 
                           setState(() {});
@@ -245,10 +235,52 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
 
-
           const Divider(),
 
+          // View Sensitivity
+          ListTile(
+            title: const Text(
+              "View Sensitivity",
+              style: TextStyle(color: Colors.white),
+            ),
 
+            subtitle: Text(
+              "${ControllerSettings.viewSensitivity.round()}%",
+              style: const TextStyle(color: Colors.grey),
+            ),
+
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+
+                builder: (context) {
+                  return ListView.builder(
+                    itemCount: viewSensitivityValues.length,
+
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text("${viewSensitivityValues[index]}%"),
+
+                        onTap: () async {
+                          await ControllerSettings.setViewSensitivity(
+                            viewSensitivityValues[index].toDouble(),
+                          );
+
+                          setState(() {});
+
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+
+          const Divider(),
 
           // Steering Calibration
           ListTile(
@@ -281,8 +313,4 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
-
-
-
 }
