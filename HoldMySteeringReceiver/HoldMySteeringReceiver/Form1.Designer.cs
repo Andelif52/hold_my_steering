@@ -34,6 +34,7 @@
             lblBrake = new Label();
             lblSteering = new Label();
             btnClose = new Button();
+            lblIP = new Label();
             SuspendLayout();
             // 
             // btnStart
@@ -89,11 +90,22 @@
             btnClose.UseVisualStyleBackColor = true;
             btnClose.Click += btnClose_Click;
             // 
+            // lblIP
+            // 
+            lblIP.AutoSize = true;
+            lblIP.Font = new Font("Yu Gothic UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblIP.Location = new Point(466, 79);
+            lblIP.Name = "lblIP";
+            lblIP.Size = new Size(107, 25);
+            lblIP.TabIndex = 6;
+            lblIP.Text = "IP Address:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(lblIP);
             Controls.Add(btnClose);
             Controls.Add(lblSteering);
             Controls.Add(lblBrake);
@@ -103,6 +115,7 @@
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -113,5 +126,6 @@
         private Label lblBrake;
         private Label lblSteering;
         private Button btnClose;
+        private Label lblIP;
     }
 }

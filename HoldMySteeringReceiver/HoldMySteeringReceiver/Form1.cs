@@ -1,3 +1,7 @@
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+
 namespace HoldMySteeringReceiver
 {
     public partial class Form1 : Form
@@ -25,10 +29,35 @@ namespace HoldMySteeringReceiver
         public Form1()
         {
             InitializeComponent();
+
+            ShowIPAddress();
         }
 
 
+        private void ShowIPAddress()
+        {
+            string ipAddress = "";
 
+            foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (networkInterface.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
+                    {
+                        if (address.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            ipAddress = address.Address.ToString();
+                            break;
+                        }
+                    }
+                }
+
+                if (ipAddress != "")
+                    break;
+            }
+
+            lblIP.Text = "IP Address: " + ipAddress;
+        }
 
 
 

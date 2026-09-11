@@ -11,6 +11,9 @@ import '../widgets/xbox_abxy_button.dart';
 import '../widgets/analog_stick.dart';
 import '../widgets/dpad.dart';
 
+import '../widgets/switch_button.dart';
+import 'controller_screen.dart';
+
 class GameControllerScreen extends StatefulWidget {
   final Socket socket;
 
@@ -30,6 +33,8 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
   double screenHeight = 0;
 
   bool layoutLoadingStarted = false;
+
+  bool switchingScreen = false;
 
   Map<String, bool> pressedButtons = {};
 
@@ -256,6 +261,15 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
           ),
         );
 
+      case "SWITCH":
+        return SwitchButton(
+          size: button.size,
+
+          opacity: button.opacity,
+
+          selected: false,
+        );
+
       default:
         return const SizedBox();
     }
@@ -296,6 +310,23 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
                                   button.type == "RIGHT_STICK" ||
                                   button.type == "DPAD")
                               ? buildButton(button)
+                              : button.type == "SWITCH"
+                              ? GestureDetector(
+                                  onTap: () async {
+                                    switchingScreen = true;
+
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ControllerScreen(
+                                          socket: widget.socket,
+                                        ),
+                                      ),
+                                    );
+                                  },
+
+                                  child: buildButton(button),
+                                )
                               : GestureDetector(
                                   onTapDown: (_) {
                                     setState(() {
@@ -324,26 +355,6 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
                                 ),
                         );
                       }),
-
-                      Positioned(
-                        top: 5,
-
-                        right: 5,
-
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-
-                            color: Colors.white,
-
-                            size: 28,
-                          ),
-
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 );
@@ -354,9 +365,11 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    if (!switchingScreen) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    }
 
     super.dispose();
   }
