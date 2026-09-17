@@ -15,7 +15,6 @@ import '../widgets/switch_button.dart';
 import 'controller_screen.dart';
 import '../settings/controller_settings.dart';
 
-
 class GameControllerScreen extends StatefulWidget {
   final Socket socket;
 
@@ -147,6 +146,8 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
           interactive: true,
 
+          stickType: button.type,
+
           onMove: (x, y) {
             widget.socket.write("${button.type}_X:${x.round()}\n");
 
@@ -157,6 +158,11 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
             widget.socket.write("${button.type}_X:0\n");
 
             widget.socket.write("${button.type}_Y:0\n");
+          },
+
+          onStickClick: (pressed) {
+            print("${button.type} CLICK: $pressed");
+            widget.socket.write("${button.type}:${pressed ? 1 : 0}\n");
           },
         );
 

@@ -252,6 +252,12 @@ namespace HoldMySteeringReceiver
                 "MENU" =>
                     Xbox360Button.Start,
 
+                "LEFT_STICK" =>
+    Xbox360Button.LeftThumb,
+
+                "RIGHT_STICK" =>
+                    Xbox360Button.RightThumb,
+
                 _ =>
                     null
             };

@@ -248,6 +248,10 @@ namespace HoldMySteeringReceiver
 
                             case "MENU":
 
+                            case "LEFT_STICK":
+
+                            case "RIGHT_STICK":
+
 
                                 xbox.SetButton(
 

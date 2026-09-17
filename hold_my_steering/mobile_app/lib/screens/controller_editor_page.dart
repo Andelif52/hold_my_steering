@@ -34,34 +34,7 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
   double screenHeight = 0;
 
   final List<String> allControllerButtons = [
-    "A",
-
-    "B",
-
-    "X",
-
-    "Y",
-
-    "LB",
-
-    "RB",
-
-    "LT",
-
-    "RT",
-
-    "LEFT_STICK",
-
-    "RIGHT_STICK",
-
-    "DPAD",
-
-    "VIEW",
-
-    "MENU",
-
-    "SWITCH",
-  ];
+    "A","B","X","Y","LB","RB","LT","RT","LEFT_STICK","RIGHT_STICK","DPAD","VIEW","MENU","SWITCH",];
 
   @override
   void initState() {
