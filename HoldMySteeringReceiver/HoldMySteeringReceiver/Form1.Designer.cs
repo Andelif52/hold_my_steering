@@ -35,6 +35,8 @@
             lblSteering = new Label();
             btnClose = new Button();
             lblIP = new Label();
+            rprtStatus = new Label();
+            btnTroubleshooting = new Button();
             SuspendLayout();
             // 
             // btnStart
@@ -100,11 +102,35 @@
             lblIP.TabIndex = 6;
             lblIP.Text = "IP Address:";
             // 
+            // rprtStatus
+            // 
+            rprtStatus.AutoSize = true;
+            rprtStatus.Font = new Font("Yu Gothic UI", 13F, FontStyle.Bold);
+            rprtStatus.Location = new Point(466, 176);
+            rprtStatus.Name = "rprtStatus";
+            rprtStatus.Size = new Size(123, 25);
+            rprtStatus.TabIndex = 7;
+            rprtStatus.Text = "Status: Ready";
+            rprtStatus.Click += label1_Click;
+            // 
+            // btnTroubleshooting
+            // 
+            btnTroubleshooting.Font = new Font("Segoe UI", 11F);
+            btnTroubleshooting.Location = new Point(630, 317);
+            btnTroubleshooting.Name = "btnTroubleshooting";
+            btnTroubleshooting.Size = new Size(136, 32);
+            btnTroubleshooting.TabIndex = 8;
+            btnTroubleshooting.Text = "Troubleshooting";
+            btnTroubleshooting.UseVisualStyleBackColor = true;
+            btnTroubleshooting.Click += btnTroubleshooting_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnTroubleshooting);
+            Controls.Add(rprtStatus);
             Controls.Add(lblIP);
             Controls.Add(btnClose);
             Controls.Add(lblSteering);
@@ -127,5 +153,7 @@
         private Label lblSteering;
         private Button btnClose;
         private Label lblIP;
+        private Label rprtStatus;
+        private Button btnTroubleshooting;
     }
 }

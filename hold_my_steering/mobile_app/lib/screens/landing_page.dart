@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'wifi_page.dart';
 import 'settings_page.dart';
 import 'controller_layout_page.dart';
+import 'steering_layout_page.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -13,33 +14,60 @@ class LandingPage extends StatelessWidget {
 
       appBar: AppBar(
         title: const Text("Hold My Steering"),
+        centerTitle: true,
+
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
 
+        leadingWidth: 110,
+
         // Controller Layout button (top-left)
-        leading: IconButton(
-          icon: const Icon(Icons.gamepad),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ControllerLayoutPage(),
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            // Controller Layout button
+            IconButton(
+              icon: const Icon(Icons.gamepad, color: Colors.orangeAccent),
+
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ControllerLayoutPage(),
+                  ),
+                );
+              },
+            ),
+
+            // Steering Layout button
+            IconButton(
+              icon: const Icon(
+                Icons.sports_motorsports,
+                color: Colors.greenAccent,
               ),
-            );
-          },
+
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SteeringLayoutPage(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
 
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings, color: Colors.blueAccent),
+
             onPressed: () {
-              // Navigate to Settings Page
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
               );
             },
           ),
@@ -54,7 +82,6 @@ class LandingPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: [
-
               const Text(
                 "Choose Connection Method",
                 style: TextStyle(
@@ -84,9 +111,7 @@ class LandingPage extends StatelessWidget {
                 ),
               ),
 
-
               const SizedBox(height: 25),
-
 
               SizedBox(
                 width: double.infinity,
@@ -103,28 +128,20 @@ class LandingPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const WifiPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const WifiPage()),
                     );
                   },
                 ),
               ),
 
-
               const SizedBox(height: 50),
-
 
               const Text(
                 "Turn your phone into a racing controller.",
                 textAlign: TextAlign.center,
 
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
-
             ],
           ),
         ),

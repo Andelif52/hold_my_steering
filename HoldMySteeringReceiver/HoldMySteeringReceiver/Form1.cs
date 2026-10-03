@@ -1,3 +1,4 @@
+using System.Data;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -29,6 +30,7 @@ namespace HoldMySteeringReceiver
         public Form1()
         {
             InitializeComponent();
+            server.StatusChanged += UpdateStatus;
 
             ShowIPAddress();
         }
@@ -59,9 +61,16 @@ namespace HoldMySteeringReceiver
             lblIP.Text = "IP Address: " + ipAddress;
         }
 
+        private void UpdateStatus(string message)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => rprtStatus.Text = message));
+                return;
+            }
 
-
-
+            rprtStatus.Text = message;
+        }
 
 
         private async void btnStart_Click(object sender, EventArgs e)
@@ -71,7 +80,7 @@ namespace HoldMySteeringReceiver
 
             btnClose.Enabled = true;
 
-            lblStatus.Text = "Listening...";
+            rprtStatus.Text = "Starting server...";
 
 
             await server.StartAsync(
@@ -83,18 +92,13 @@ namespace HoldMySteeringReceiver
 
 
 
-
-
-
-
-
         private void btnClose_Click(object sender, EventArgs e)
         {
 
             server.StopServer();
 
 
-            lblStatus.Text = "Server Closed";
+            rprtStatus.Text = "Server Closed";
 
 
             btnClose.Enabled = false;
@@ -102,19 +106,28 @@ namespace HoldMySteeringReceiver
             btnStart.Enabled = true;
 
         }
-
-
-
-
-
-
-
-
-
         private void ProcessMessage(string msg)
         {
 
             System.Diagnostics.Debug.WriteLine("Received: " + msg);
+
+
+            if (msg.StartsWith("SYNC:"))
+            {
+                long pcTime =
+                    DateTimeOffset.UtcNow
+                        .ToUnixTimeMilliseconds();
+
+
+                server.SendMessage(
+                    $"SYNC_REPLY:{pcTime}"
+                );
+
+
+                return;
+            }
+
+
 
             Invoke(() =>
             {
@@ -207,7 +220,7 @@ namespace HoldMySteeringReceiver
 
 
 
-                if (parts.Length == 2)
+                if (parts.Length >= 2)
                 {
 
                     string command =
@@ -216,6 +229,26 @@ namespace HoldMySteeringReceiver
 
                     string value =
                         parts[1];
+
+                    if (parts.Length == 3)
+                    {
+                        long phoneTimestamp =
+                            long.Parse(parts[2]);
+
+
+                        long pcTimestamp =
+                            DateTimeOffset.UtcNow
+                                .ToUnixTimeMilliseconds();
+
+
+                        long latency =
+                            pcTimestamp - (phoneTimestamp / 1000);
+
+
+                        System.Diagnostics.Debug.WriteLine(
+                            $"Phone: {phoneTimestamp} | PC: {pcTimestamp} | Latency: {latency} ms"
+                           );
+                    }
 
 
 
@@ -486,7 +519,17 @@ namespace HoldMySteeringReceiver
 
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void btnTroubleshooting_Click(object sender, EventArgs e)
+        {
+            TroubleshootingForm troubleshootingForm = new TroubleshootingForm();
+
+            troubleshootingForm.ShowDialog();
+        }
     }
 
 }

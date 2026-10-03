@@ -37,3 +37,4 @@ C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8
 C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.pdb
 C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.genruntimeconfig.cache
 C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\ref\HoldMySteeringReceiver.dll
+C:\Hold My Steering\HoldMySteeringReceiver\HoldMySteeringReceiver\obj\Debug\net8.0-windows\HoldMySteeringReceiver.TroubleshootingForm.resources

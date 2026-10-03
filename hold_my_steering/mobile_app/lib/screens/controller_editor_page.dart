@@ -34,7 +34,21 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
   double screenHeight = 0;
 
   final List<String> allControllerButtons = [
-    "A","B","X","Y","LB","RB","LT","RT","LEFT_STICK","RIGHT_STICK","DPAD","VIEW","MENU","SWITCH",];
+    "A",
+    "B",
+    "X",
+    "Y",
+    "LB",
+    "RB",
+    "LT",
+    "RT",
+    "LEFT_STICK",
+    "RIGHT_STICK",
+    "DPAD",
+    "VIEW",
+    "MENU",
+    "SWITCH",
+  ];
 
   @override
   void initState() {
@@ -107,17 +121,15 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
   }
 
   void addNewButton(String type) {
-
     if (type == "RIGHT_STICK") {
       layout!.rightStickFullScreen = false;
     }
-    
+
     final newButton = ControllerButton(
       type: type,
 
-      x: screenWidth / 2 - 50,
-
-      y: screenHeight / 2 - 50,
+      x: 0.5,
+      y: 0.5,
 
       size: screenHeight * 0.20,
 
@@ -308,9 +320,9 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
 
   void moveButton(ControllerButton button, DragUpdateDetails details) {
     setState(() {
-      double newX = button.x + details.delta.dx;
+      double newX = (button.x * screenWidth) + details.delta.dx;
 
-      double newY = button.y + details.delta.dy;
+      double newY = (button.y * screenHeight) + details.delta.dy;
 
       if (newX < 0) {
         newX = 0;
@@ -328,9 +340,9 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
         newY = screenHeight - button.size;
       }
 
-      button.x = newX;
+      button.x = newX / screenWidth;
 
-      button.y = newY;
+      button.y = newY / screenHeight;
     });
   }
 
@@ -381,9 +393,9 @@ class _ControllerEditorPageState extends State<ControllerEditorPage> {
                     )
                     .map((button) {
                       return Positioned(
-                        left: button.x,
+                        left: button.x * screenWidth,
 
-                        top: button.y,
+                        top: button.y * screenHeight,
 
                         child: GestureDetector(
                           onTap: () {

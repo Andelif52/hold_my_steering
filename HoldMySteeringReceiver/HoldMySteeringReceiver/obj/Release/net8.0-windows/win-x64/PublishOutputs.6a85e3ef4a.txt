@@ -1,0 +1,7 @@
+C:\HoldMySteering\Releases\Receiver\HoldMySteeringReceiver.pdb
+C:\HoldMySteering\Releases\Receiver\D3DCompiler_47_cor3.dll
+C:\HoldMySteering\Releases\Receiver\PenImc_cor3.dll
+C:\HoldMySteering\Releases\Receiver\PresentationNative_cor3.dll
+C:\HoldMySteering\Releases\Receiver\vcruntime140_cor3.dll
+C:\HoldMySteering\Releases\Receiver\wpfgfx_cor3.dll
+C:\HoldMySteering\Releases\Receiver\HoldMySteeringReceiver.exe

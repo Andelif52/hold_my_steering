@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HoldMySteeringReceiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+279213a42b573976dfd3f110728178d170d2f4b8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6562b37ee5351dfba86190e993e1a8d9ea3b9612")]
 [assembly: System.Reflection.AssemblyProductAttribute("HoldMySteeringReceiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HoldMySteeringReceiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

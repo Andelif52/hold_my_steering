@@ -6,66 +6,175 @@ namespace HoldMySteeringReceiver
 {
     public class TcpServer
     {
+        private TcpClient? connectedClient;
+
         private TcpListener? listener;
 
         private bool isRunning = false;
 
 
+        public event Action<string>? StatusChanged;
+
+
+        private void ReportStatus(string message)
+        {
+            StatusChanged?.Invoke(message);
+        }
+
+
         public async Task StartAsync(Action<string> onMessage)
         {
-            listener =
-                new TcpListener(
-                    IPAddress.Any,
-                    5000);
-
-            listener.Start();
-
-            isRunning = true;
-
-
-            while (isRunning)
+            try
             {
-                try
+                listener =
+                    new TcpListener(
+                        IPAddress.Any,
+                        5000);
+
+                listener.Start();
+
+                isRunning = true;
+
+
+                ReportStatus(
+                    "Server started.\nWaiting for mobile connection..."
+                );
+
+
+                while (isRunning)
                 {
-                    var client =
-                        await listener
-                        .AcceptTcpClientAsync();
-
-
-                    _ = Task.Run(async () =>
+                    try
                     {
-                        var stream =
-                            client.GetStream();
-
-                        StreamReader reader =
-                            new StreamReader(stream);
+                        var client =
+                            await listener
+                            .AcceptTcpClientAsync();
 
 
+                        connectedClient = client;
 
-                        while (true)
+
+                        ReportStatus(
+                            "Mobile device connected."
+                        );
+
+
+                        _ = Task.Run(async () =>
                         {
-                            string? msg =
-                                await reader
-                                .ReadLineAsync();
+                            try
+                            {
+                                var stream =
+                                    client.GetStream();
 
-                            if (msg == null)
-                                break;
 
-                            onMessage(msg);
+                                StreamReader reader =
+                                    new StreamReader(stream);
+
+
+
+                                while (true)
+                                {
+                                    string? msg =
+                                        await reader
+                                        .ReadLineAsync();
+
+
+                                    if (msg == null)
+                                    {
+                                        break;
+                                    }
+
+
+                                    Console.WriteLine(
+                                        "RAW TCP MESSAGE LENGTH: "
+                                        + msg.Length
+                                    );
+
+
+                                    Console.WriteLine(
+                                        "RAW TCP MESSAGE CONTENT: ["
+                                        + msg + "]"
+                                    );
+
+
+                                    onMessage(msg);
+                                }
+
+                            }
+                            catch
+                            {
+
+                            }
+                            finally
+                            {
+                                connectedClient = null;
+
+                                ReportStatus(
+                                    "Mobile device disconnected."
+                                );
+                            }
+
+                        });
+
+                    }
+                    catch (SocketException ex)
+                    {
+                        if (isRunning)
+                        {
+                            ReportStatus(
+                                "Network error: " + ex.Message
+                            );
                         }
 
-                    });
+                        break;
+                    }
 
                 }
-                catch (SocketException)
-                {
-                    // This happens when the server
-                    // is intentionally closed.
 
-                    break;
-                }
+            }
+            catch (SocketException ex)
+            {
+                ReportStatus(
+                    "Server could not start.\n\n" +
+                    "Possible causes:\n" +
+                    "• Another application is using the port.\n" +
+                    "• Windows Firewall blocked the application.\n\n" +
+                    ex.Message
+                );
+            }
+
+        }
+
+
+
+        public void SendMessage(string message)
+        {
+            if (connectedClient == null)
+                return;
+
+
+            try
+            {
+                var stream =
+                    connectedClient.GetStream();
+
+
+                StreamWriter writer =
+                    new StreamWriter(stream);
+
+
+                writer.WriteLine(message);
+
+                writer.Flush();
+
+            }
+            catch
+            {
+                ReportStatus(
+                    "Failed to send data to mobile device."
+                );
             }
         }
+
 
 
         public void StopServer()
@@ -73,6 +182,16 @@ namespace HoldMySteeringReceiver
             isRunning = false;
 
             listener?.Stop();
+
+
+            connectedClient?.Close();
+
+            connectedClient = null;
+
+
+            ReportStatus(
+                "Server stopped."
+            );
         }
 
     }

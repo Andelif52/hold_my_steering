@@ -84,7 +84,15 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
   }
 
   void sendButtonCommand(String button, bool pressed) {
-    widget.socket.write("$button:${pressed ? 1 : 0}\n");
+    int timestamp = DateTime.now().microsecondsSinceEpoch;
+
+    print("$button:${pressed ? 1 : 0}:$timestamp");
+
+    String message = "$button:${pressed ? 1 : 0}:$timestamp\n";
+
+    print("SENDING: $message");
+
+    widget.socket.write(message);
   }
 
   void sendViewMovement(Offset currentPosition) {
@@ -338,98 +346,96 @@ class _GameControllerScreenState extends State<GameControllerScreen> {
 
           return loading || layout == null
               ? const Center(child: CircularProgressIndicator())
-              : SafeArea(
-                  child: Stack(
-                    children: [
-                      if (layout!.rightStickFullScreen)
-                        Positioned.fill(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
+              : Stack(
+                  children: [
+                    if (layout!.rightStickFullScreen)
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
 
-                            onPanStart: (details) {
-                              viewStartPosition = details.localPosition;
+                          onPanStart: (details) {
+                            viewStartPosition = details.localPosition;
 
-                              viewActive = true;
+                            viewActive = true;
 
-                              widget.socket.write("RIGHT_STICK_X:0\n");
+                            widget.socket.write("RIGHT_STICK_X:0\n");
 
-                              widget.socket.write("RIGHT_STICK_Y:0\n");
-                            },
+                            widget.socket.write("RIGHT_STICK_Y:0\n");
+                          },
 
-                            onPanUpdate: (details) {
-                              if (viewActive) {
-                                sendViewMovement(details.localPosition);
-                              }
-                            },
+                          onPanUpdate: (details) {
+                            if (viewActive) {
+                              sendViewMovement(details.localPosition);
+                            }
+                          },
 
-                            onPanEnd: (_) {
-                              releaseView();
-                            },
+                          onPanEnd: (_) {
+                            releaseView();
+                          },
 
-                            onPanCancel: () {
-                              releaseView();
-                            },
-                          ),
+                          onPanCancel: () {
+                            releaseView();
+                          },
                         ),
+                      ),
 
-                      ...layout!.buttons.map((button) {
-                        return Positioned(
-                          left: button.x,
+                    ...layout!.buttons.map((button) {
+                      return Positioned(
+                        left: button.x * screenWidth,
 
-                          top: button.y,
+                        top: button.y * screenHeight,
 
-                          child:
-                              (button.type == "LEFT_STICK" ||
-                                  button.type == "RIGHT_STICK" ||
-                                  button.type == "DPAD")
-                              ? buildButton(button)
-                              : button.type == "SWITCH"
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    switchingScreen = true;
+                        child:
+                            (button.type == "LEFT_STICK" ||
+                                button.type == "RIGHT_STICK" ||
+                                button.type == "DPAD")
+                            ? buildButton(button)
+                            : button.type == "SWITCH"
+                            ? GestureDetector(
+                                onTap: () async {
+                                  switchingScreen = true;
 
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ControllerScreen(
-                                          socket: widget.socket,
-                                        ),
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ControllerScreen(
+                                        socket: widget.socket,
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  );
+                                },
 
-                                  child: buildButton(button),
-                                )
-                              : GestureDetector(
-                                  onTapDown: (_) {
-                                    setState(() {
-                                      pressedButtons[button.type] = true;
-                                    });
+                                child: buildButton(button),
+                              )
+                            : GestureDetector(
+                                onTapDown: (_) {
+                                  setState(() {
+                                    pressedButtons[button.type] = true;
+                                  });
 
-                                    sendButtonCommand(button.type, true);
-                                  },
+                                  sendButtonCommand(button.type, true);
+                                },
 
-                                  onTapUp: (_) {
-                                    setState(() {
-                                      pressedButtons[button.type] = false;
-                                    });
+                                onTapUp: (_) {
+                                  setState(() {
+                                    pressedButtons[button.type] = false;
+                                  });
 
-                                    sendButtonCommand(button.type, false);
-                                  },
+                                  sendButtonCommand(button.type, false);
+                                },
 
-                                  onTapCancel: () {
-                                    setState(() {
-                                      pressedButtons[button.type] = false;
-                                    });
+                                onTapCancel: () {
+                                  setState(() {
+                                    pressedButtons[button.type] = false;
+                                  });
 
-                                    sendButtonCommand(button.type, false);
-                                  },
-                                  child: buildButton(button),
-                                ),
-                        );
-                      }),
-                    ],
-                  ),
+                                  sendButtonCommand(button.type, false);
+                                },
+                                child: buildButton(button),
+                              ),
+                      );
+                    }),
+                  ],
                 );
         },
       ),
