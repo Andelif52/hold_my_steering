@@ -29,6 +29,8 @@ class AddSteeringButtonDialog extends StatelessWidget {
 
     "CLUTCH",
 
+    "HORN",
+
   ];
 
 
@@ -52,6 +54,9 @@ class AddSteeringButtonDialog extends StatelessWidget {
       case "CLUTCH":
         return "Clutch";
 
+      case "HORN":
+        return "Horn";
+        
       default:
         return type;
 

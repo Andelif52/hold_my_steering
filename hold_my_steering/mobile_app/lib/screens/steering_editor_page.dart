@@ -11,6 +11,7 @@ import '../widgets/steering_editor_control_panel.dart';
 import '../widgets/steering_layout_control_panel.dart';
 import '../widgets/save_steering_layout_dialog.dart';
 import '../widgets/xbox_mapping_dialog.dart';
+import '../widgets/switch_button.dart';
 
 class SteeringEditorPage extends StatefulWidget {
   final SteeringLayout? existingLayout;
@@ -222,13 +223,7 @@ class _SteeringEditorPageState extends State<SteeringEditorPage> {
     }
 
     if (button.type == "TILT") {
-      return const Icon(
-        Icons.stay_current_landscape,
-
-        color: Colors.white,
-
-        size: 80,
-      );
+      return const SizedBox();
     }
 
     return const SizedBox();
@@ -310,6 +305,16 @@ class _SteeringEditorPageState extends State<SteeringEditorPage> {
                     ),
                   );
                 }),
+
+                // FIXED SWITCH BUTTON PREVIEW
+                Positioned(
+                  top: 20,
+                  right: 20,
+
+                  child: AbsorbPointer(
+                    child: const SwitchButton(size: 60, opacity: 1.0),
+                  ),
+                ),
 
                 if (selectedButton != null)
                   Positioned(

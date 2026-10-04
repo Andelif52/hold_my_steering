@@ -37,6 +37,9 @@ class SteeringButtonWidget extends StatelessWidget {
       case "CLUTCH":
         return "assets/icons/clutch.svg";
 
+      case "HORN":
+        return "assets/icons/horn.svg";
+
       default:
         return null;
     }
